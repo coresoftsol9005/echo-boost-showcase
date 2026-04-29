@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Globe, Heart, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote } from "lucide-react";
 import { z } from "zod";
-import heroLaptop from "@/assets/hero-laptop.jpg";
+import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +13,35 @@ const leadSchema = z.object({
   message: z.string().trim().min(10, "Tell us a bit more (min 10 chars)").max(1000, "Message too long"),
 });
 type LeadInput = z.infer<typeof leadSchema>;
+
+// ── Scroll-triggered count-up hook ──
+function useCountUp(target: number, duration = 1800) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const p = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setValue(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target, duration]);
+  return { ref, value };
+}
 
 const WHATSAPP = "https://wa.me/918168194134";
 
@@ -29,11 +58,38 @@ const businesses = [
   { name: "Lumière Spa", tag: "Wellness" },
 ];
 
-const stats = [
-  { n: "7", suffix: "Days", label: "Average delivery" },
-  { n: "3", suffix: "×", label: "Revenue growth" },
-  { n: "50", suffix: "+", label: "Local businesses" },
-  { n: "30", suffix: "min", label: "Response on WhatsApp" },
+const stats: { target: number; suffix: string; label: string }[] = [
+  { target: 7, suffix: "d", label: "Average delivery" },
+  { target: 3, suffix: "×", label: "Revenue growth" },
+  { target: 50, suffix: "+", label: "Local businesses" },
+  { target: 30, suffix: "m", label: "Response on WhatsApp" },
+];
+
+const articles = [
+  {
+    tag: "Local SEO",
+    title: "How Hisar restaurants ranked #1 on Google in 30 days",
+    excerpt: "A practical playbook covering Google Business Profile, NAP citations, and review velocity that triples your walk-ins.",
+    date: "Apr 14, 2026",
+    read: "6 min read",
+    href: "#",
+  },
+  {
+    tag: "WhatsApp Marketing",
+    title: "WhatsApp automation that turned 1 lead into 8 bookings",
+    excerpt: "Templates, click-to-chat funnels, and the exact follow-up cadence we use for clinics, salons and boutiques.",
+    date: "Apr 02, 2026",
+    read: "5 min read",
+    href: "#",
+  },
+  {
+    tag: "Web Design",
+    title: "Apple-grade websites for ₹0 down — what's actually inside",
+    excerpt: "A peek at our 7-day starter pack: typography, micro-interactions, and a conversion stack tuned for India.",
+    date: "Mar 21, 2026",
+    read: "8 min read",
+    href: "#",
+  },
 ];
 
 const industries = [
@@ -90,7 +146,8 @@ function Header() {
           <a href="#industries" className="hover:text-foreground transition">Services</a>
           <a href="#industries" className="hover:text-foreground transition">Industries</a>
           <a href="#about" className="hover:text-foreground transition">About</a>
-          <a href="#stories" className="hover:text-foreground transition">Stories</a>
+          <a href="#testimonials" className="hover:text-foreground transition">Testimonials</a>
+          <a href="#blog" className="hover:text-foreground transition">Blog</a>
           <a href="#contact" className="hover:text-foreground transition">Contact</a>
         </div>
         <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
@@ -102,15 +159,36 @@ function Header() {
 }
 
 function Hero() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--rx", `${(-y * 6).toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+    el.style.setProperty("--tx", `${(x * 12).toFixed(2)}px`);
+    el.style.setProperty("--ty", `${(y * 12).toFixed(2)}px`);
+  };
+  const onLeave = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    el.style.setProperty("--rx", `0deg`);
+    el.style.setProperty("--ry", `0deg`);
+    el.style.setProperty("--tx", `0px`);
+    el.style.setProperty("--ty", `0px`);
+  };
+
   return (
     <section id="top" className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
-      <div className="absolute inset-0 -z-10 opacity-60" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.35), transparent 70%)" }} />
+      <div className="absolute inset-0 -z-10 opacity-70" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.4), transparent 70%)" }} />
       <div className="mx-auto max-w-6xl px-5 md:px-8 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8 animate-fade-in">
           <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">Hisar · Digital Media · Business Audits</span>
         </div>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight animate-fade-in">
           Innovation for<br />
           <span className="text-gradient-red">every business.</span>
         </h1>
@@ -122,35 +200,62 @@ function Hero() {
           <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
             Get a free audit <ArrowRight className="h-4 w-4" />
           </a>
-          <a href="#stories" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">
+          <a href="#testimonials" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">
             See what we build
           </a>
         </div>
 
-        <div className="relative mt-16 md:mt-20">
-          <div className="absolute inset-x-10 top-10 h-72 bg-gradient-red opacity-30 blur-3xl rounded-full -z-10" />
-          <img
-            src={heroLaptop}
-            alt="CoreSoft premium website displayed on a MacBook"
-            width={1920}
-            height={1080}
-            fetchPriority="high"
-            className="mx-auto w-full max-w-4xl rounded-2xl shadow-elegant animate-float"
-          />
-          <div className="absolute -left-2 top-1/3 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card">
-            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-red text-primary-foreground">
-              <MessageCircle className="h-5 w-5" />
+        <div
+          ref={wrapRef}
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          className="group relative mt-16 md:mt-20 [perspective:1400px]"
+          style={{ ["--rx" as any]: "0deg", ["--ry" as any]: "0deg", ["--tx" as any]: "0px", ["--ty" as any]: "0px" }}
+        >
+          <div className="absolute inset-x-10 top-10 h-72 bg-gradient-red opacity-40 blur-3xl rounded-full -z-10" />
+          <div
+            className="relative mx-auto w-full max-w-5xl transition-transform duration-200 ease-out will-change-transform"
+            style={{ transform: "rotateX(var(--rx)) rotateY(var(--ry)) translate3d(var(--tx),var(--ty),0)" }}
+          >
+            <img
+              src={heroBanner}
+              alt="CoreSoft Solutions — premium websites, WhatsApp leads, Google ranking and analytics for local businesses"
+              width={1920}
+              height={1280}
+              fetchPriority="high"
+              className="w-full rounded-3xl shadow-elegant animate-float"
+            />
+            <div className="absolute -left-3 md:-left-6 top-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
+              <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-red text-primary-foreground">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <div className="text-left">
+                <div className="text-sm font-bold">+18 leads today</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Live · Hisar</div>
+              </div>
             </div>
-            <div className="text-left">
-              <div className="text-sm font-bold">+18 leads today</div>
-              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Live · Hisar</div>
+            <div className="absolute -right-3 md:-right-6 bottom-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
+              <div className="grid place-items-center h-10 w-10 rounded-xl bg-secondary text-secondary-foreground font-black">4.9</div>
+              <div className="text-left">
+                <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Avg client rating</div>
+              </div>
             </div>
-          </div>
-          <div className="absolute -right-2 bottom-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card">
-            <div className="grid place-items-center h-10 w-10 rounded-xl bg-secondary text-secondary-foreground font-black">4.9</div>
-            <div className="text-left">
-              <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
-              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Avg client rating</div>
+            <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 hidden md:flex glass rounded-2xl px-5 py-3 gap-4 items-center shadow-card" style={{ transform: "translate(-50%, 0) translateZ(80px)" }}>
+              <div className="text-center">
+                <div className="text-lg font-black text-gradient-red">#1</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Google rank</div>
+              </div>
+              <span className="h-8 w-px bg-border/60" />
+              <div className="text-center">
+                <div className="text-lg font-black">7d</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Delivery</div>
+              </div>
+              <span className="h-8 w-px bg-border/60" />
+              <div className="text-center">
+                <div className="text-lg font-black">3×</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Growth</div>
+              </div>
             </div>
           </div>
         </div>
@@ -194,16 +299,23 @@ function Stats() {
         </p>
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px bg-border/40 rounded-2xl overflow-hidden shadow-card">
           {stats.map((s) => (
-            <div key={s.label} className="bg-gradient-card p-8 md:p-10 text-center">
-              <div className="text-5xl md:text-6xl font-black tracking-tight">
-                {s.n}<span className="text-gradient-red">{s.suffix}</span>
-              </div>
-              <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{s.label}</div>
-            </div>
+            <StatCard key={s.label} target={s.target} suffix={s.suffix} label={s.label} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function StatCard({ target, suffix, label }: { target: number; suffix: string; label: string }) {
+  const { ref, value } = useCountUp(target);
+  return (
+    <div ref={ref} className="bg-gradient-card p-8 md:p-10 text-center">
+      <div className="text-5xl md:text-6xl font-black tracking-tight tabular-nums">
+        {value}<span className="text-gradient-red">{suffix}</span>
+      </div>
+      <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
+    </div>
   );
 }
 
@@ -365,13 +477,15 @@ function About() {
   );
 }
 
-function Stories() {
+function Testimonials() {
+  const [active, setActive] = useState(0);
+  const featured = stories[active];
   return (
-    <section id="stories" className="py-24 md:py-32">
+    <section id="testimonials" className="py-24 md:py-32" aria-labelledby="testimonials-heading">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <p className="eyebrow">Client Results</p>
+        <p className="eyebrow">Customer Testimonials</p>
         <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight">
+          <h2 id="testimonials-heading" className="text-4xl md:text-6xl font-black tracking-tight">
             Real businesses. <span className="text-gradient-red">Real growth.</span>
           </h2>
           <p className="text-foreground/70 max-w-md">
@@ -379,20 +493,102 @@ function Stories() {
           </p>
         </div>
 
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {stories.map((s) => (
-            <article key={s.name} className="rounded-3xl bg-gradient-card border border-border/40 p-7 shadow-card flex flex-col">
+        {/* Featured testimonial */}
+        <div className="mt-12 relative overflow-hidden rounded-3xl glass shadow-elegant p-8 md:p-14">
+          <div className="absolute -top-10 -left-10 h-60 w-60 bg-primary/30 blur-3xl rounded-full" aria-hidden />
+          <div className="absolute -bottom-10 -right-10 h-60 w-60 bg-accent/20 blur-3xl rounded-full" aria-hidden />
+          <Quote className="h-10 w-10 text-primary opacity-60" aria-hidden />
+          <blockquote className="relative mt-6 text-xl md:text-3xl font-medium leading-snug tracking-tight text-foreground">
+            "{featured.quote}"
+          </blockquote>
+          <div className="relative mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="grid place-items-center h-14 w-14 rounded-full bg-gradient-red text-primary-foreground font-black">{featured.initials}</div>
+              <div>
+                <div className="font-bold">{featured.name}</div>
+                <div className="text-sm text-muted-foreground">{featured.company} · {featured.tag}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {stories.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActive(i)}
+                  aria-label={`Show testimonial ${i + 1}`}
+                  className={`h-2 rounded-full transition-all ${i === active ? "w-8 bg-primary" : "w-2 bg-foreground/20 hover:bg-foreground/40"}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {stories.map((s, i) => (
+            <button
+              type="button"
+              onClick={() => setActive(i)}
+              key={s.name}
+              className={`text-left rounded-3xl glass border p-7 shadow-card flex flex-col transition hover:-translate-y-1 hover:border-primary/40 ${i === active ? "border-primary/50 ring-1 ring-primary/30" : "border-border/40"}`}
+            >
               <div className="flex items-center justify-between">
                 <span className="rounded-full bg-primary/15 text-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest">{s.tag}</span>
-                <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
+                <div className="flex gap-0.5 text-primary" aria-label="5 star rating">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
               </div>
-              <p className="mt-5 text-foreground/85 leading-relaxed">"{s.quote}"</p>
+              <p className="mt-5 text-foreground/85 leading-relaxed line-clamp-4">"{s.quote}"</p>
               <div className="mt-6 pt-5 border-t border-border/40 flex items-center gap-3">
                 <div className="grid place-items-center h-11 w-11 rounded-full bg-gradient-red text-primary-foreground font-black text-sm">{s.initials}</div>
                 <div>
                   <div className="font-bold text-sm">{s.name}</div>
                   <div className="text-xs text-muted-foreground">{s.company}</div>
                 </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Blog() {
+  return (
+    <section id="blog" className="py-24 md:py-32" aria-labelledby="blog-heading">
+      <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="flex items-end justify-between flex-wrap gap-6">
+          <div>
+            <p className="eyebrow">From the Studio</p>
+            <h2 id="blog-heading" className="mt-4 text-4xl md:text-6xl font-black tracking-tight">
+              Articles & <span className="text-gradient-red">field notes.</span>
+            </h2>
+            <p className="mt-4 text-foreground/70 max-w-xl">
+              Playbooks, breakdowns and stories from the front lines of digital growth — written for India's local heroes.
+            </p>
+          </div>
+          <a href="#blog" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition">
+            All articles <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+
+        <div className="mt-12 grid md:grid-cols-3 gap-5">
+          {articles.map((a) => (
+            <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
+              <div className="relative h-44 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-red opacity-80 group-hover:opacity-100 transition" />
+                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.6), transparent 50%), radial-gradient(circle at 80% 80%, hsl(var(--primary-glow) / 0.6), transparent 50%)" }} />
+                <BookOpen className="absolute right-5 top-5 h-7 w-7 text-primary-foreground/80" aria-hidden />
+                <span className="absolute left-5 bottom-5 rounded-full bg-background/30 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground border border-primary-foreground/20">{a.tag}</span>
+              </div>
+              <div className="p-7 flex flex-col flex-1">
+                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">{a.title}</h3>
+                <p className="mt-3 text-sm text-foreground/70 line-clamp-3">{a.excerpt}</p>
+                <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                  <span className="inline-flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {a.date}</span>
+                  <span className="inline-flex items-center gap-1.5"><Clock className="h-3 w-3" /> {a.read}</span>
+                </div>
+                <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
+                  Read article <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </div>
             </article>
           ))}
@@ -401,6 +597,7 @@ function Stories() {
     </section>
   );
 }
+
 
 function Contact() {
   const { toast } = useToast();
@@ -453,44 +650,51 @@ function Contact() {
   };
 
   const fieldCls = (k: keyof LeadInput) =>
-    `w-full rounded-lg bg-input/60 border px-4 py-3 text-sm focus:outline-none transition ${
-      errors[k] ? "border-destructive focus:border-destructive" : "border-border/40 focus:border-primary"
+    `w-full rounded-xl bg-background/40 backdrop-blur border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${
+      errors[k] ? "border-destructive focus:border-destructive" : "border-border/30 focus:border-primary/60 hover:border-border/60"
     }`;
 
   return (
-    <section id="contact" className="py-24 md:py-32">
+    <section id="contact" className="py-24 md:py-32 relative" aria-labelledby="contact-heading" itemScope itemType="https://schema.org/Organization">
+      <div className="absolute inset-x-0 top-1/3 -z-10 h-96 bg-gradient-red opacity-20 blur-[140px] rounded-full mx-auto max-w-3xl" aria-hidden />
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="rounded-3xl bg-gradient-card border border-border/40 shadow-elegant overflow-hidden grid lg:grid-cols-2">
-          <div className="p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-border/40">
-            <p className="eyebrow">Let's Talk</p>
-            <h2 className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
+        <div className="rounded-3xl glass shadow-elegant overflow-hidden grid lg:grid-cols-2 relative">
+          <div className="absolute inset-0 -z-10 opacity-50" style={{ background: "radial-gradient(60% 80% at 0% 0%, hsl(var(--primary) / 0.18), transparent 60%), radial-gradient(60% 80% at 100% 100%, hsl(var(--accent) / 0.12), transparent 60%)" }} aria-hidden />
+          <div className="p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-border/30 relative">
+            <p className="eyebrow">Contact CoreSoft Solutions</p>
+            <h2 id="contact-heading" className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
               Your audit is <span className="text-gradient-red">free.</span><br />Your growth isn't.
             </h2>
-            <p className="mt-5 text-foreground/70">
-              Send us a message — we'll review your business online and respond on WhatsApp within 30 minutes.
+            <p className="mt-5 text-foreground/70" itemProp="description">
+              Get in touch with CoreSoft Solutions in Hisar, Haryana. We'll review your business online and respond on WhatsApp within 30 minutes.
             </p>
+            <meta itemProp="name" content="CoreSoft Solutions" />
+            <meta itemProp="email" content="admin@coresoftsolutions.net" />
+            <meta itemProp="telephone" content="+91-81681-94134" />
             <div className="mt-8 space-y-4">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="flex items-center gap-3 group">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><Phone className="h-5 w-5" /></div>
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="flex items-center gap-3 group" aria-label="Chat on WhatsApp +91 81681 94134">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><Phone className="h-5 w-5" /></div>
                 <div>
                   <div className="font-bold group-hover:text-primary transition">+91 81681 94134</div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">WhatsApp · 30 min response</div>
                 </div>
               </a>
-              <div className="flex items-center gap-3">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><MapPin className="h-5 w-5" /></div>
+              <div className="flex items-center gap-3" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><MapPin className="h-5 w-5" /></div>
                 <div>
-                  <div className="font-bold">Hisar, Haryana · India</div>
+                  <div className="font-bold">
+                    <span itemProp="addressLocality">Hisar</span>, <span itemProp="addressRegion">Haryana</span> · <span itemProp="addressCountry">India</span>
+                  </div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Studio</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><Mail className="h-5 w-5" /></div>
+              <a href="mailto:admin@coresoftsolutions.net" className="flex items-center gap-3 group">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><Mail className="h-5 w-5" /></div>
                 <div>
-                  <div className="font-bold">hello@coresoftsolutions.in</div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Email</div>
+                  <div className="font-bold group-hover:text-primary transition">admin@coresoftsolutions.net</div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Email · 24h response</div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -567,7 +771,7 @@ function Footer() {
             <p className="eyebrow">Contact</p>
             <ul className="mt-4 space-y-2 text-sm">
               <li><a href={WHATSAPP} target="_blank" rel="noreferrer" className="hover:text-primary transition">+91 81681 94134</a></li>
-              <li><a href="mailto:hello@coresoftsolutions.in" className="hover:text-primary transition">hello@coresoftsolutions.in</a></li>
+              <li><a href="mailto:admin@coresoftsolutions.net" className="hover:text-primary transition">admin@coresoftsolutions.net</a></li>
               <li className="text-muted-foreground">Hisar, Haryana</li>
             </ul>
           </div>
@@ -599,7 +803,8 @@ const Index = () => {
       <Industries />
       <FreeTrial />
       <About />
-      <Stories />
+      <Testimonials />
+      <Blog />
       <Contact />
       <Footer />
       <a
