@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Globe, Heart, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote } from "lucide-react";
 import { z } from "zod";
-import heroLaptop from "@/assets/hero-laptop.jpg";
+import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +13,35 @@ const leadSchema = z.object({
   message: z.string().trim().min(10, "Tell us a bit more (min 10 chars)").max(1000, "Message too long"),
 });
 type LeadInput = z.infer<typeof leadSchema>;
+
+// ── Scroll-triggered count-up hook ──
+function useCountUp(target: number, duration = 1800) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const p = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setValue(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target, duration]);
+  return { ref, value };
+}
 
 const WHATSAPP = "https://wa.me/918168194134";
 
