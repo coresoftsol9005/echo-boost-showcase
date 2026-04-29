@@ -298,16 +298,23 @@ function Stats() {
         </p>
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px bg-border/40 rounded-2xl overflow-hidden shadow-card">
           {stats.map((s) => (
-            <div key={s.label} className="bg-gradient-card p-8 md:p-10 text-center">
-              <div className="text-5xl md:text-6xl font-black tracking-tight">
-                {s.n}<span className="text-gradient-red">{s.suffix}</span>
-              </div>
-              <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{s.label}</div>
-            </div>
+            <StatCard key={s.label} target={s.target} suffix={s.suffix} label={s.label} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function StatCard({ target, suffix, label }: { target: number; suffix: string; label: string }) {
+  const { ref, value } = useCountUp(target);
+  return (
+    <div ref={ref} className="bg-gradient-card p-8 md:p-10 text-center">
+      <div className="text-5xl md:text-6xl font-black tracking-tight tabular-nums">
+        {value}<span className="text-gradient-red">{suffix}</span>
+      </div>
+      <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
+    </div>
   );
 }
 
