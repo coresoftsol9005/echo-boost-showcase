@@ -13,9 +13,11 @@
     <meta name="geo.placename" content="Hisar, Haryana" />
     <link rel="canonical" href="https://coresoftsolutions.net/" />
 
-    <!-- Faster FCP: preconnect to font origins and load fonts via <link> instead of CSS @import -->
+    <!-- Faster FCP/LCP: preconnect to font origins and load fonts via <link> instead of CSS @import -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload the exact Poppins 900 woff2 used by the LCP H1 to eliminate font-driven render delay -->
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLBT5Z1xlFd2JQEk.woff2" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" /></noscript>
