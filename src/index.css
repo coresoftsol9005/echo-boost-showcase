@@ -100,3 +100,26 @@
   50% { transform: translateY(-12px); }
 }
 .animate-float { animation: float 6s ease-in-out infinite; }
+
+/* Slide-in-from-left reveal used by SectionReveal */
+.reveal-slide {
+  opacity: 0;
+  transform: translate3d(-60px, 0, 0);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal-slide.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-slide { opacity: 1; transform: none; transition: none; }
+}
+
+/* Mobile dropdown menu animation */
+@keyframes menu-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-menu-down { animation: menu-down 0.2s ease-out both; }
