@@ -650,14 +650,16 @@ function Contact() {
   };
 
   const fieldCls = (k: keyof LeadInput) =>
-    `w-full rounded-lg bg-input/60 border px-4 py-3 text-sm focus:outline-none transition ${
-      errors[k] ? "border-destructive focus:border-destructive" : "border-border/40 focus:border-primary"
+    `w-full rounded-xl bg-background/40 backdrop-blur border px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 transition ${
+      errors[k] ? "border-destructive focus:border-destructive" : "border-border/30 focus:border-primary/60 hover:border-border/60"
     }`;
 
   return (
-    <section id="contact" className="py-24 md:py-32">
+    <section id="contact" className="py-24 md:py-32 relative" aria-labelledby="contact-heading" itemScope itemType="https://schema.org/Organization">
+      <div className="absolute inset-x-0 top-1/3 -z-10 h-96 bg-gradient-red opacity-20 blur-[140px] rounded-full mx-auto max-w-3xl" aria-hidden />
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="rounded-3xl bg-gradient-card border border-border/40 shadow-elegant overflow-hidden grid lg:grid-cols-2">
+        <div className="rounded-3xl glass shadow-elegant overflow-hidden grid lg:grid-cols-2 relative">
+          <div className="absolute inset-0 -z-10 opacity-50" style={{ background: "radial-gradient(60% 80% at 0% 0%, hsl(var(--primary) / 0.18), transparent 60%), radial-gradient(60% 80% at 100% 100%, hsl(var(--accent) / 0.12), transparent 60%)" }} aria-hidden />
           <div className="p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-border/40">
             <p className="eyebrow">Let's Talk</p>
             <h2 className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
