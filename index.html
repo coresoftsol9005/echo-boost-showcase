@@ -13,8 +13,14 @@
     <meta name="geo.placename" content="Hisar, Haryana" />
     <link rel="canonical" href="https://coresoftsolutions.net/" />
 
-    
-    
+    <!-- Faster FCP: preconnect to font origins and load fonts via <link> instead of CSS @import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" /></noscript>
+
+
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://coresoftsolutions.net/" />
     <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c1531985-1729-491c-9a1f-6f20c7f90ddb">
