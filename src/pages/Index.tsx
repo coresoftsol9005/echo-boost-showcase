@@ -660,36 +660,41 @@ function Contact() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <div className="rounded-3xl glass shadow-elegant overflow-hidden grid lg:grid-cols-2 relative">
           <div className="absolute inset-0 -z-10 opacity-50" style={{ background: "radial-gradient(60% 80% at 0% 0%, hsl(var(--primary) / 0.18), transparent 60%), radial-gradient(60% 80% at 100% 100%, hsl(var(--accent) / 0.12), transparent 60%)" }} aria-hidden />
-          <div className="p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-border/40">
-            <p className="eyebrow">Let's Talk</p>
-            <h2 className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
+          <div className="p-10 md:p-14 border-b lg:border-b-0 lg:border-r border-border/30 relative">
+            <p className="eyebrow">Contact CoreSoft Solutions</p>
+            <h2 id="contact-heading" className="mt-4 text-4xl md:text-5xl font-black tracking-tight">
               Your audit is <span className="text-gradient-red">free.</span><br />Your growth isn't.
             </h2>
-            <p className="mt-5 text-foreground/70">
-              Send us a message — we'll review your business online and respond on WhatsApp within 30 minutes.
+            <p className="mt-5 text-foreground/70" itemProp="description">
+              Get in touch with CoreSoft Solutions in Hisar, Haryana. We'll review your business online and respond on WhatsApp within 30 minutes.
             </p>
+            <meta itemProp="name" content="CoreSoft Solutions" />
+            <meta itemProp="email" content="admin@coresoftsolutions.net" />
+            <meta itemProp="telephone" content="+91-81681-94134" />
             <div className="mt-8 space-y-4">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="flex items-center gap-3 group">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><Phone className="h-5 w-5" /></div>
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="flex items-center gap-3 group" aria-label="Chat on WhatsApp +91 81681 94134">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><Phone className="h-5 w-5" /></div>
                 <div>
                   <div className="font-bold group-hover:text-primary transition">+91 81681 94134</div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">WhatsApp · 30 min response</div>
                 </div>
               </a>
-              <div className="flex items-center gap-3">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><MapPin className="h-5 w-5" /></div>
+              <div className="flex items-center gap-3" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><MapPin className="h-5 w-5" /></div>
                 <div>
-                  <div className="font-bold">Hisar, Haryana · India</div>
+                  <div className="font-bold">
+                    <span itemProp="addressLocality">Hisar</span>, <span itemProp="addressRegion">Haryana</span> · <span itemProp="addressCountry">India</span>
+                  </div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Studio</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><Mail className="h-5 w-5" /></div>
+              <a href="mailto:admin@coresoftsolutions.net" className="flex items-center gap-3 group">
+                <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary border border-primary/20"><Mail className="h-5 w-5" /></div>
                 <div>
-                  <div className="font-bold">admin@coresoftsolutions.net</div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Email</div>
+                  <div className="font-bold group-hover:text-primary transition">admin@coresoftsolutions.net</div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Email · 24h response</div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
