@@ -137,29 +137,89 @@ function Logo({ className = "h-10" }: { className?: string }) {
   );
 }
 
+const NAV_LINKS: { href: string; label: string }[] = [
+  { href: "#industries", label: "Services" },
+  { href: "#industries", label: "Industries" },
+  { href: "#about", label: "About" },
+  { href: "#testimonials", label: "Testimonials" },
+  { href: "#blog", label: "Blog" },
+  { href: "#contact", label: "Contact" },
+];
+
 function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+  // Close on ESC
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "glass" : "bg-transparent"}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
       <nav className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 md:px-8">
         <Logo />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
-          <a href="#industries" className="hover:text-foreground transition">Services</a>
-          <a href="#industries" className="hover:text-foreground transition">Industries</a>
-          <a href="#about" className="hover:text-foreground transition">About</a>
-          <a href="#testimonials" className="hover:text-foreground transition">Testimonials</a>
-          <a href="#blog" className="hover:text-foreground transition">Blog</a>
-          <a href="#contact" className="hover:text-foreground transition">Contact</a>
+          {NAV_LINKS.map((l) => (
+            <a key={l.label} href={l.href} className="hover:text-foreground transition">{l.label}</a>
+          ))}
         </div>
-        <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
-          Get Audit <ArrowRight className="h-4 w-4" />
-        </a>
+        <div className="flex items-center gap-3">
+          <a href="#trial" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
+            Get Audit <ArrowRight className="h-4 w-4" />
+          </a>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            className="md:hidden inline-flex items-center gap-1.5 rounded-full glass px-3.5 py-2.5 text-foreground hover:bg-surface-elevated transition"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+          </button>
+        </div>
       </nav>
+      {open && (
+        <div
+          id="mobile-menu"
+          className="md:hidden glass border-t border-border/40 animate-menu-down"
+        >
+          <div className="mx-auto max-w-6xl px-5 py-4 flex flex-col">
+            {NAV_LINKS.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="py-3 border-b border-border/30 last:border-b-0 text-base font-semibold text-foreground/90 hover:text-primary transition flex items-center justify-between"
+              >
+                {l.label}
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </a>
+            ))}
+            <a
+              href="#trial"
+              onClick={() => setOpen(false)}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-5 py-3 text-sm font-bold text-primary-foreground shadow-glow"
+            >
+              Get Audit <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
