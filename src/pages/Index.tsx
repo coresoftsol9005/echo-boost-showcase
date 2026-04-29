@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Globe, Heart } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Globe, Heart, Loader2 } from "lucide-react";
+import { z } from "zod";
 import heroLaptop from "@/assets/hero-laptop.jpg";
+import logoDark from "@/assets/logo-dark.svg";
+import { useToast } from "@/hooks/use-toast";
+
+const leadSchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
+  business: z.string().trim().min(2, "Business name required").max(100, "Business name too long"),
+  type: z.string().min(1, "Select a business type"),
+  phone: z.string().trim().regex(/^[+]?[0-9\s-]{10,15}$/, "Enter a valid phone number"),
+  message: z.string().trim().min(10, "Tell us a bit more (min 10 chars)").max(1000, "Message too long"),
+});
+type LeadInput = z.infer<typeof leadSchema>;
 
 const WHATSAPP = "https://wa.me/918168194134";
 
@@ -55,17 +67,10 @@ const stories = [
   { tag: "Education", quote: "Admission season mein CoreSoft ki digital campaign se 40+ new admissions mile. Website, Facebook ads, aur WhatsApp follow-up — sab kuch ek jagah se manage hua. Superb team!", name: "Neha Gupta", company: "Little Stars Play School", initials: "NG" },
 ];
 
-function Logo() {
+function Logo({ className = "h-10" }: { className?: string }) {
   return (
-    <a href="#top" className="group flex items-center gap-3" aria-label="CoreSoft Solutions home">
-      <div className="relative h-10 w-10 rounded-xl bg-gradient-red shadow-glow grid place-items-center">
-        <span className="text-primary-foreground font-black text-lg leading-none">C</span>
-        <span className="absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-background" />
-      </div>
-      <div className="leading-tight">
-        <div className="font-black tracking-tight text-foreground">CoreSoft</div>
-        <div className="font-mono text-[9px] tracking-[0.3em] text-muted-foreground uppercase">Solutions</div>
-      </div>
+    <a href="#top" className="inline-flex items-center" aria-label="CoreSoft Solutions home">
+      <img src={logoDark} alt="CoreSoft Solutions" className={`${className} w-auto`} width={560} height={160} />
     </a>
   );
 }
