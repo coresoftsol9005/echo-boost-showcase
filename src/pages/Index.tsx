@@ -138,6 +138,50 @@ function Logo({ className = "h-10" }: { className?: string }) {
       <img src={logoDark} alt="CoreSoft Solutions" className={`${className} w-auto`} width={560} height={160} />
     </a>
   );
+
+type ImgWithSkeletonProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+  /** Tailwind classes for the wrapping figure (sizing, rounding, position). */
+  wrapperClassName?: string;
+  /** Optional skeleton override class. */
+  skeletonClassName?: string;
+};
+
+/** <img> that shows a shimmer skeleton until the bitmap is decoded. */
+function ImgWithSkeleton({
+  wrapperClassName,
+  skeletonClassName,
+  className,
+  onLoad,
+  onError,
+  src,
+  ...rest
+}: ImgWithSkeletonProps) {
+  const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
+  // If the image is already cached, mark it loaded synchronously to avoid flash.
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
+  }, [src]);
+  return (
+    <span className={`relative block ${wrapperClassName ?? ""}`}>
+      {!loaded && !errored && (
+        <span
+          aria-hidden
+          className={`absolute inset-0 skeleton-shimmer ${skeletonClassName ?? ""}`}
+        />
+      )}
+      <img
+        ref={imgRef}
+        src={src}
+        className={`${className ?? ""} ${loaded ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}
+        onLoad={(e) => { setLoaded(true); onLoad?.(e); }}
+        onError={(e) => { setErrored(true); setLoaded(true); onError?.(e); }}
+        {...rest}
+      />
+    </span>
+  );
 }
 
 const NAV_LINKS: { href: string; label: string }[] = [
