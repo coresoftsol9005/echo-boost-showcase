@@ -551,12 +551,6 @@ function Contact() {
     </section>
   );
 }
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function Footer() {
   return (
