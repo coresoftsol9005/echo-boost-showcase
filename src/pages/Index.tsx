@@ -146,7 +146,8 @@ function Header() {
           <a href="#industries" className="hover:text-foreground transition">Services</a>
           <a href="#industries" className="hover:text-foreground transition">Industries</a>
           <a href="#about" className="hover:text-foreground transition">About</a>
-          <a href="#stories" className="hover:text-foreground transition">Stories</a>
+          <a href="#testimonials" className="hover:text-foreground transition">Testimonials</a>
+          <a href="#blog" className="hover:text-foreground transition">Blog</a>
           <a href="#contact" className="hover:text-foreground transition">Contact</a>
         </div>
         <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
@@ -683,7 +684,7 @@ function Contact() {
               <div className="flex items-center gap-3">
                 <div className="grid place-items-center h-11 w-11 rounded-xl bg-primary/15 text-primary"><Mail className="h-5 w-5" /></div>
                 <div>
-                  <div className="font-bold">hello@coresoftsolutions.in</div>
+                  <div className="font-bold">admin@coresoftsolutions.net</div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Email</div>
                 </div>
               </div>
@@ -763,7 +764,7 @@ function Footer() {
             <p className="eyebrow">Contact</p>
             <ul className="mt-4 space-y-2 text-sm">
               <li><a href={WHATSAPP} target="_blank" rel="noreferrer" className="hover:text-primary transition">+91 81681 94134</a></li>
-              <li><a href="mailto:hello@coresoftsolutions.in" className="hover:text-primary transition">hello@coresoftsolutions.in</a></li>
+              <li><a href="mailto:admin@coresoftsolutions.net" className="hover:text-primary transition">admin@coresoftsolutions.net</a></li>
               <li className="text-muted-foreground">Hisar, Haryana</li>
             </ul>
           </div>
@@ -795,7 +796,8 @@ const Index = () => {
       <Industries />
       <FreeTrial />
       <About />
-      <Stories />
+      <Testimonials />
+      <Blog />
       <Contact />
       <Footer />
       <a
