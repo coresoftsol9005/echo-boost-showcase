@@ -403,6 +403,60 @@ function Stories() {
 }
 
 function Contact() {
+  const { toast } = useToast();
+  const [values, setValues] = useState<LeadInput>({
+    name: "",
+    business: "",
+    type: "Restaurant / Café",
+    phone: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadInput, string>>>({});
+  const [loading, setLoading] = useState(false);
+
+  const update = (k: keyof LeadInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setValues((v) => ({ ...v, [k]: e.target.value }));
+    if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
+  };
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const parsed = leadSchema.safeParse(values);
+    if (!parsed.success) {
+      const fieldErrors: Partial<Record<keyof LeadInput, string>> = {};
+      parsed.error.issues.forEach((i) => {
+        const k = i.path[0] as keyof LeadInput;
+        if (!fieldErrors[k]) fieldErrors[k] = i.message;
+      });
+      setErrors(fieldErrors);
+      toast({ title: "Please fix the highlighted fields", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const d = parsed.data;
+      const msg =
+        `Hi CoreSoft! 👋\n\n` +
+        `Name: ${d.name}\n` +
+        `Business: ${d.business} (${d.type})\n` +
+        `Phone: ${d.phone}\n\n` +
+        `What I need:\n${d.message}`;
+      await new Promise((r) => setTimeout(r, 600));
+      window.open(`${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+      toast({ title: "Opening WhatsApp…", description: "We'll reply within 30 minutes." });
+      setValues({ name: "", business: "", type: "Restaurant / Café", phone: "", message: "" });
+    } catch {
+      toast({ title: "Something went wrong", description: "Please WhatsApp us directly.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fieldCls = (k: keyof LeadInput) =>
+    `w-full rounded-lg bg-input/60 border px-4 py-3 text-sm focus:outline-none transition ${
+      errors[k] ? "border-destructive focus:border-destructive" : "border-border/40 focus:border-primary"
+    }`;
+
   return (
     <section id="contact" className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
@@ -440,54 +494,63 @@ function Contact() {
             </div>
           </div>
 
-          <form
-            className="p-10 md:p-14 space-y-5"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              const msg = `Hi CoreSoft! I'm ${data.get("name")} from ${data.get("business")} (${data.get("type")}). ${data.get("message")}`;
-              window.open(`${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
-            }}
-          >
+          <form className="p-10 md:p-14 space-y-5" onSubmit={onSubmit} noValidate>
             <div>
-              <p className="eyebrow">Client Discovery Form</p>
+              <p className="eyebrow">WhatsApp Lead Form</p>
               <h3 className="mt-3 text-2xl font-black">Apka Business, Hamaari <span className="text-gradient-red">Digital Expertise.</span></h3>
-              <p className="mt-2 text-sm text-foreground/70">Tell us about your business in a few quick steps.</p>
+              <p className="mt-2 text-sm text-foreground/70">Fill this in and we'll reach you on WhatsApp.</p>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Your Name</label>
-                <input required name="name" className="w-full rounded-lg bg-input/60 border border-border/40 px-4 py-3 text-sm focus:border-primary focus:outline-none transition" placeholder="Rajesh Kumar" />
+                <label htmlFor="lf-name" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Your Name</label>
+                <input id="lf-name" name="name" value={values.name} onChange={update("name")} className={fieldCls("name")} placeholder="Rajesh Kumar" disabled={loading} maxLength={80} aria-invalid={!!errors.name} />
+                {errors.name && <p className="mt-1.5 text-xs text-destructive">{errors.name}</p>}
               </div>
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Business Name</label>
-                <input required name="business" className="w-full rounded-lg bg-input/60 border border-border/40 px-4 py-3 text-sm focus:border-primary focus:outline-none transition" placeholder="Sharma Restaurant" />
+                <label htmlFor="lf-biz" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Business Name</label>
+                <input id="lf-biz" name="business" value={values.business} onChange={update("business")} className={fieldCls("business")} placeholder="Sharma Restaurant" disabled={loading} maxLength={100} aria-invalid={!!errors.business} />
+                {errors.business && <p className="mt-1.5 text-xs text-destructive">{errors.business}</p>}
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="lf-type" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Business Type</label>
+                <select id="lf-type" name="type" value={values.type} onChange={update("type")} className={fieldCls("type")} disabled={loading}>
+                  <option>Restaurant / Café</option>
+                  <option>Doctor / Clinic</option>
+                  <option>Salon / Spa</option>
+                  <option>Retail / Boutique</option>
+                  <option>Services / Contractor</option>
+                  <option>Education</option>
+                  <option>Other</option>
+                </select>
+                {errors.type && <p className="mt-1.5 text-xs text-destructive">{errors.type}</p>}
+              </div>
+              <div>
+                <label htmlFor="lf-phone" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">WhatsApp Number</label>
+                <input id="lf-phone" name="phone" type="tel" value={values.phone} onChange={update("phone")} className={fieldCls("phone")} placeholder="+91 98XXXXXXXX" disabled={loading} maxLength={15} aria-invalid={!!errors.phone} />
+                {errors.phone && <p className="mt-1.5 text-xs text-destructive">{errors.phone}</p>}
               </div>
             </div>
             <div>
-              <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">Business Type</label>
-              <select required name="type" className="w-full rounded-lg bg-input/60 border border-border/40 px-4 py-3 text-sm focus:border-primary focus:outline-none transition">
-                <option>Restaurant / Café</option>
-                <option>Doctor / Clinic</option>
-                <option>Salon / Spa</option>
-                <option>Retail / Boutique</option>
-                <option>Services / Contractor</option>
-                <option>Education</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div>
-              <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">What do you need?</label>
-              <textarea name="message" rows={4} className="w-full rounded-lg bg-input/60 border border-border/40 px-4 py-3 text-sm focus:border-primary focus:outline-none transition resize-none" placeholder="Website, Google ranking, Instagram growth..." />
+              <label htmlFor="lf-msg" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-bold block mb-2">What do you need?</label>
+              <textarea id="lf-msg" name="message" rows={4} value={values.message} onChange={update("message")} className={`${fieldCls("message")} resize-none`} placeholder="Website, Google ranking, Instagram growth..." disabled={loading} maxLength={1000} aria-invalid={!!errors.message} />
+              {errors.message && <p className="mt-1.5 text-xs text-destructive">{errors.message}</p>}
             </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {["7 Din Delivery","30 Min Response","100% Transparent"].map((t)=>(
                 <span key={t} className="rounded-full bg-secondary/15 text-secondary px-3 py-1 text-[10px] font-bold uppercase tracking-widest">{t}</span>
               ))}
             </div>
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-7 py-4 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.01] transition">
-              Let's Get Started <ArrowRight className="h-4 w-4" />
+            <button type="submit" disabled={loading} className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-7 py-4 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.01] transition disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100">
+              {loading ? (<><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>) : (<>Send on WhatsApp <ArrowRight className="h-4 w-4" /></>)}
             </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
           </form>
         </div>
       </div>
