@@ -616,7 +616,7 @@ function Contact() {
     if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const parsed = leadSchema.safeParse(values);
     if (!parsed.success) {
@@ -630,23 +630,26 @@ function Contact() {
       return;
     }
     setLoading(true);
-    try {
-      const d = parsed.data;
-      const msg =
-        `Hi CoreSoft! 👋\n\n` +
-        `Name: ${d.name}\n` +
-        `Business: ${d.business} (${d.type})\n` +
-        `Phone: ${d.phone}\n\n` +
-        `What I need:\n${d.message}`;
-      await new Promise((r) => setTimeout(r, 600));
-      window.open(`${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
-      toast({ title: "Opening WhatsApp…", description: "We'll reply within 30 minutes." });
-      setValues({ name: "", business: "", type: "Restaurant / Café", phone: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please WhatsApp us directly.", variant: "destructive" });
-    } finally {
-      setLoading(false);
+    const d = parsed.data;
+    const msg =
+      `Hi CoreSoft! 👋\n\n` +
+      `Name: ${d.name}\n` +
+      `Business: ${d.business} (${d.type})\n` +
+      `Phone: ${d.phone}\n\n` +
+      `What I need:\n${d.message}`;
+    const url = `${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+    // Open synchronously inside the user gesture to avoid popup blockers.
+    const win = window.open(url, "_blank", "noopener,noreferrer");
+    if (!win || win.closed || typeof win.closed === "undefined") {
+      // Popup blocked — navigate current tab as fallback.
+      window.location.href = url;
     }
+
+    toast({ title: "Opening WhatsApp…", description: "We'll reply within 30 minutes." });
+    setValues({ name: "", business: "", type: "Restaurant / Café", phone: "", message: "" });
+    // Brief loading state for visual feedback
+    setTimeout(() => setLoading(false), 400);
   };
 
   const fieldCls = (k: keyof LeadInput) =>
