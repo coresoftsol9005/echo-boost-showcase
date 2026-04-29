@@ -876,19 +876,45 @@ function Footer() {
   );
 }
 
+function SectionReveal({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="reveal-slide">
+      {children}
+    </div>
+  );
+}
+
 const Index = () => {
   return (
     <main>
       <Header />
       <Hero />
       <Marquee />
-      <Stats />
-      <Industries />
-      <FreeTrial />
-      <About />
-      <Testimonials />
-      <Blog />
-      <Contact />
+      <SectionReveal><Stats /></SectionReveal>
+      <SectionReveal><Industries /></SectionReveal>
+      <SectionReveal><FreeTrial /></SectionReveal>
+      <SectionReveal><About /></SectionReveal>
+      <SectionReveal><Testimonials /></SectionReveal>
+      <SectionReveal><Blog /></SectionReveal>
+      <SectionReveal><Contact /></SectionReveal>
       <Footer />
       <a
         href={WHATSAPP}
