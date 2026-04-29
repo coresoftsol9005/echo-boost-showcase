@@ -965,19 +965,178 @@ function SectionReveal({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** The set of major sections the user can swipe through on mobile. */
+const MOBILE_SLIDES: { id: string; label: string; render: () => JSX.Element }[] = [
+  { id: "stats", label: "Stats", render: () => <Stats /> },
+  { id: "industries", label: "Services", render: () => <Industries /> },
+  { id: "trial", label: "Free Trial", render: () => <FreeTrial /> },
+  { id: "about", label: "About", render: () => <About /> },
+  { id: "testimonials", label: "Testimonials", render: () => <Testimonials /> },
+  { id: "blog", label: "Blog", render: () => <Blog /> },
+  { id: "contact", label: "Contact", render: () => <Contact /> },
+];
+
+function prefersReducedMotion() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function MobileSectionCarousel() {
+  const reduceMotion = prefersReducedMotion();
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    skipSnaps: false,
+    duration: reduceMotion ? 0 : 25,
+    containScroll: "trimSnaps",
+  });
+  const [selected, setSelected] = useState(0);
+  const [ready, setReady] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Track selected snap
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    // Mark ready on next tick so skeleton can fade out cleanly
+    const t = window.setTimeout(() => setReady(true), 250);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+      window.clearTimeout(t);
+    };
+  }, [emblaApi]);
+
+  // Listen for in-page nav and scroll the carousel to the matching slide.
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onNav = (e: Event) => {
+      const hash = (e as CustomEvent<{ hash: string }>).detail?.hash;
+      if (!hash) return;
+      const id = hash.replace(/^#/, "");
+      const idx = MOBILE_SLIDES.findIndex((s) => s.id === id);
+      if (idx >= 0) {
+        emblaApi.scrollTo(idx, reduceMotion);
+        // Bring the carousel itself into view
+        wrapperRef.current?.scrollIntoView({
+          behavior: reduceMotion ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    };
+    window.addEventListener("coresoft:nav", onNav as EventListener);
+    return () => window.removeEventListener("coresoft:nav", onNav as EventListener);
+  }, [emblaApi, reduceMotion]);
+
+  // Honor existing #hash on first paint (e.g. /#blog)
+  useEffect(() => {
+    if (!emblaApi) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const idx = MOBILE_SLIDES.findIndex((s) => s.id === hash.replace(/^#/, ""));
+    if (idx > 0) emblaApi.scrollTo(idx, true);
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  return (
+    <div ref={wrapperRef} aria-roledescription="carousel" aria-label="Page sections">
+      <div className="relative">
+        {/* Skeleton overlay shown briefly until embla initializes */}
+        {!ready && (
+          <div aria-hidden className="px-5 pt-10 pb-6 space-y-4">
+            <Skeleton className="h-6 w-32 skeleton-shimmer" />
+            <Skeleton className="h-12 w-3/4 skeleton-shimmer" />
+            <Skeleton className="h-40 w-full rounded-2xl skeleton-shimmer" />
+            <div className="grid grid-cols-2 gap-3">
+              <Skeleton className="h-24 rounded-2xl skeleton-shimmer" />
+              <Skeleton className="h-24 rounded-2xl skeleton-shimmer" />
+            </div>
+          </div>
+        )}
+
+        <div className={`section-carousel-viewport transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`} ref={emblaRef}>
+          <div className="section-carousel-track">
+            {MOBILE_SLIDES.map((s, i) => (
+              <div
+                key={s.id}
+                className="section-carousel-slide"
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${s.label} (${i + 1} of ${MOBILE_SLIDES.length})`}
+                aria-hidden={i !== selected}
+              >
+                {s.render()}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination + arrows */}
+        <div className="sticky bottom-4 z-30 mx-auto mt-4 flex w-fit items-center gap-3 rounded-full glass px-3 py-2 shadow-card">
+          <button
+            type="button"
+            onClick={scrollPrev}
+            disabled={selected === 0}
+            aria-label="Previous section"
+            className="grid h-8 w-8 place-items-center rounded-full bg-surface-elevated text-foreground/80 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-1.5" role="tablist" aria-label="Section">
+            {MOBILE_SLIDES.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={i === selected}
+                aria-label={`Go to ${s.label}`}
+                onClick={() => emblaApi?.scrollTo(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === selected ? "w-6 bg-primary" : "w-2 bg-foreground/25 hover:bg-foreground/50"
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={scrollNext}
+            disabled={selected === MOBILE_SLIDES.length - 1}
+            aria-label="Next section"
+            className="grid h-8 w-8 place-items-center rounded-full bg-surface-elevated text-foreground/80 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Index = () => {
+  const isMobile = useIsMobile();
   return (
     <main>
       <Header />
       <Hero />
       <Marquee />
-      <SectionReveal><Stats /></SectionReveal>
-      <SectionReveal><Industries /></SectionReveal>
-      <SectionReveal><FreeTrial /></SectionReveal>
-      <SectionReveal><About /></SectionReveal>
-      <SectionReveal><Testimonials /></SectionReveal>
-      <SectionReveal><Blog /></SectionReveal>
-      <SectionReveal><Contact /></SectionReveal>
+      {isMobile ? (
+        <MobileSectionCarousel />
+      ) : (
+        <>
+          <SectionReveal><Stats /></SectionReveal>
+          <SectionReveal><Industries /></SectionReveal>
+          <SectionReveal><FreeTrial /></SectionReveal>
+          <SectionReveal><About /></SectionReveal>
+          <SectionReveal><Testimonials /></SectionReveal>
+          <SectionReveal><Blog /></SectionReveal>
+          <SectionReveal><Contact /></SectionReveal>
+        </>
+      )}
       <Footer />
       <a
         href={WHATSAPP}
