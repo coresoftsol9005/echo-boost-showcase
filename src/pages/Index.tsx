@@ -476,13 +476,15 @@ function About() {
   );
 }
 
-function Stories() {
+function Testimonials() {
+  const [active, setActive] = useState(0);
+  const featured = stories[active];
   return (
-    <section id="stories" className="py-24 md:py-32">
+    <section id="testimonials" className="py-24 md:py-32" aria-labelledby="testimonials-heading">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <p className="eyebrow">Client Results</p>
+        <p className="eyebrow">Customer Testimonials</p>
         <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight">
+          <h2 id="testimonials-heading" className="text-4xl md:text-6xl font-black tracking-tight">
             Real businesses. <span className="text-gradient-red">Real growth.</span>
           </h2>
           <p className="text-foreground/70 max-w-md">
@@ -490,20 +492,102 @@ function Stories() {
           </p>
         </div>
 
-        <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {stories.map((s) => (
-            <article key={s.name} className="rounded-3xl bg-gradient-card border border-border/40 p-7 shadow-card flex flex-col">
+        {/* Featured testimonial */}
+        <div className="mt-12 relative overflow-hidden rounded-3xl glass shadow-elegant p-8 md:p-14">
+          <div className="absolute -top-10 -left-10 h-60 w-60 bg-primary/30 blur-3xl rounded-full" aria-hidden />
+          <div className="absolute -bottom-10 -right-10 h-60 w-60 bg-accent/20 blur-3xl rounded-full" aria-hidden />
+          <Quote className="h-10 w-10 text-primary opacity-60" aria-hidden />
+          <blockquote className="relative mt-6 text-xl md:text-3xl font-medium leading-snug tracking-tight text-foreground">
+            "{featured.quote}"
+          </blockquote>
+          <div className="relative mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="grid place-items-center h-14 w-14 rounded-full bg-gradient-red text-primary-foreground font-black">{featured.initials}</div>
+              <div>
+                <div className="font-bold">{featured.name}</div>
+                <div className="text-sm text-muted-foreground">{featured.company} · {featured.tag}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {stories.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActive(i)}
+                  aria-label={`Show testimonial ${i + 1}`}
+                  className={`h-2 rounded-full transition-all ${i === active ? "w-8 bg-primary" : "w-2 bg-foreground/20 hover:bg-foreground/40"}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {stories.map((s, i) => (
+            <button
+              type="button"
+              onClick={() => setActive(i)}
+              key={s.name}
+              className={`text-left rounded-3xl glass border p-7 shadow-card flex flex-col transition hover:-translate-y-1 hover:border-primary/40 ${i === active ? "border-primary/50 ring-1 ring-primary/30" : "border-border/40"}`}
+            >
               <div className="flex items-center justify-between">
                 <span className="rounded-full bg-primary/15 text-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest">{s.tag}</span>
-                <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
+                <div className="flex gap-0.5 text-primary" aria-label="5 star rating">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
               </div>
-              <p className="mt-5 text-foreground/85 leading-relaxed">"{s.quote}"</p>
+              <p className="mt-5 text-foreground/85 leading-relaxed line-clamp-4">"{s.quote}"</p>
               <div className="mt-6 pt-5 border-t border-border/40 flex items-center gap-3">
                 <div className="grid place-items-center h-11 w-11 rounded-full bg-gradient-red text-primary-foreground font-black text-sm">{s.initials}</div>
                 <div>
                   <div className="font-bold text-sm">{s.name}</div>
                   <div className="text-xs text-muted-foreground">{s.company}</div>
                 </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Blog() {
+  return (
+    <section id="blog" className="py-24 md:py-32" aria-labelledby="blog-heading">
+      <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <div className="flex items-end justify-between flex-wrap gap-6">
+          <div>
+            <p className="eyebrow">From the Studio</p>
+            <h2 id="blog-heading" className="mt-4 text-4xl md:text-6xl font-black tracking-tight">
+              Articles & <span className="text-gradient-red">field notes.</span>
+            </h2>
+            <p className="mt-4 text-foreground/70 max-w-xl">
+              Playbooks, breakdowns and stories from the front lines of digital growth — written for India's local heroes.
+            </p>
+          </div>
+          <a href="#blog" className="hidden md:inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition">
+            All articles <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+
+        <div className="mt-12 grid md:grid-cols-3 gap-5">
+          {articles.map((a) => (
+            <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
+              <div className="relative h-44 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-red opacity-80 group-hover:opacity-100 transition" />
+                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.6), transparent 50%), radial-gradient(circle at 80% 80%, hsl(var(--primary-glow) / 0.6), transparent 50%)" }} />
+                <BookOpen className="absolute right-5 top-5 h-7 w-7 text-primary-foreground/80" aria-hidden />
+                <span className="absolute left-5 bottom-5 rounded-full bg-background/30 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground border border-primary-foreground/20">{a.tag}</span>
+              </div>
+              <div className="p-7 flex flex-col flex-1">
+                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">{a.title}</h3>
+                <p className="mt-3 text-sm text-foreground/70 line-clamp-3">{a.excerpt}</p>
+                <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                  <span className="inline-flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {a.date}</span>
+                  <span className="inline-flex items-center gap-1.5"><Clock className="h-3 w-3" /> {a.read}</span>
+                </div>
+                <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
+                  Read article <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </div>
             </article>
           ))}
@@ -512,6 +596,7 @@ function Stories() {
     </section>
   );
 }
+
 
 function Contact() {
   const { toast } = useToast();
