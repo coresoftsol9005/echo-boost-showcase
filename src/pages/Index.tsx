@@ -149,6 +149,12 @@ const NAV_LINKS: { href: string; label: string }[] = [
   { href: "#contact", label: "Contact" },
 ];
 
+// Dispatched by header / CTA anchors so the mobile carousel can sync.
+function emitNavTo(hash: string) {
+  if (!hash || !hash.startsWith("#")) return;
+  window.dispatchEvent(new CustomEvent("coresoft:nav", { detail: { hash } }));
+}
+
 function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -170,17 +176,22 @@ function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const handleNavClick = (href: string) => () => {
+    setOpen(false);
+    emitNavTo(href);
+  };
+
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
       <nav className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 md:px-8">
         <Logo />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="hover:text-foreground transition">{l.label}</a>
+            <a key={l.label} href={l.href} onClick={handleNavClick(l.href)} className="hover:text-foreground transition">{l.label}</a>
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <a href="#trial" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
+          <a href="#trial" onClick={handleNavClick("#trial")} className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
             Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
@@ -206,7 +217,7 @@ function Header() {
               <a
                 key={l.label}
                 href={l.href}
-                onClick={() => setOpen(false)}
+                onClick={handleNavClick(l.href)}
                 className="py-3 border-b border-border/30 last:border-b-0 text-base font-semibold text-foreground/90 hover:text-primary transition flex items-center justify-between"
               >
                 {l.label}
@@ -215,7 +226,7 @@ function Header() {
             ))}
             <a
               href="#trial"
-              onClick={() => setOpen(false)}
+              onClick={handleNavClick("#trial")}
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-5 py-3 text-sm font-bold text-primary-foreground shadow-glow"
             >
               Get Audit <ArrowRight className="h-4 w-4" />
