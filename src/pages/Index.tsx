@@ -58,11 +58,38 @@ const businesses = [
   { name: "Lumière Spa", tag: "Wellness" },
 ];
 
-const stats = [
-  { n: "7", suffix: "Days", label: "Average delivery" },
-  { n: "3", suffix: "×", label: "Revenue growth" },
-  { n: "50", suffix: "+", label: "Local businesses" },
-  { n: "30", suffix: "min", label: "Response on WhatsApp" },
+const stats: { target: number; suffix: string; label: string }[] = [
+  { target: 7, suffix: "d", label: "Average delivery" },
+  { target: 3, suffix: "×", label: "Revenue growth" },
+  { target: 50, suffix: "+", label: "Local businesses" },
+  { target: 30, suffix: "m", label: "Response on WhatsApp" },
+];
+
+const articles = [
+  {
+    tag: "Local SEO",
+    title: "How Hisar restaurants ranked #1 on Google in 30 days",
+    excerpt: "A practical playbook covering Google Business Profile, NAP citations, and review velocity that triples your walk-ins.",
+    date: "Apr 14, 2026",
+    read: "6 min read",
+    href: "#",
+  },
+  {
+    tag: "WhatsApp Marketing",
+    title: "WhatsApp automation that turned 1 lead into 8 bookings",
+    excerpt: "Templates, click-to-chat funnels, and the exact follow-up cadence we use for clinics, salons and boutiques.",
+    date: "Apr 02, 2026",
+    read: "5 min read",
+    href: "#",
+  },
+  {
+    tag: "Web Design",
+    title: "Apple-grade websites for ₹0 down — what's actually inside",
+    excerpt: "A peek at our 7-day starter pack: typography, micro-interactions, and a conversion stack tuned for India.",
+    date: "Mar 21, 2026",
+    read: "8 min read",
+    href: "#",
+  },
 ];
 
 const industries = [
