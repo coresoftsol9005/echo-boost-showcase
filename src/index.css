@@ -59,6 +59,7 @@
     font-family: 'Poppins', system-ui, sans-serif;
     background-image: var(--gradient-hero);
     background-attachment: fixed;
+    overflow-x: hidden;
   }
   h1, h2, h3, h4 { letter-spacing: -0.025em; }
   .font-mono { font-family: 'DM Mono', ui-monospace, monospace; }
