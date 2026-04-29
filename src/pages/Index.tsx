@@ -703,12 +703,14 @@ function Blog() {
           {articles.map((a) => (
             <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
               <a href={a.href} target="_blank" rel="noopener noreferrer" className="relative block h-48 overflow-hidden" aria-label={a.title}>
-                <img
+                <ImgWithSkeleton
                   src={a.image}
                   alt={a.title}
                   loading="lazy"
                   width={1200}
                   height={800}
+                  wrapperClassName="absolute inset-0"
+                  skeletonClassName=""
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
