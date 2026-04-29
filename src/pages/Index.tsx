@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { z } from "zod";
+import useEmblaCarousel from "embla-carousel-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
@@ -137,6 +140,51 @@ function Logo({ className = "h-10" }: { className?: string }) {
   );
 }
 
+type ImgWithSkeletonProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+  /** Tailwind classes for the wrapping figure (sizing, rounding, position). */
+  wrapperClassName?: string;
+  /** Optional skeleton override class. */
+  skeletonClassName?: string;
+};
+
+/** <img> that shows a shimmer skeleton until the bitmap is decoded. */
+function ImgWithSkeleton({
+  wrapperClassName,
+  skeletonClassName,
+  className,
+  onLoad,
+  onError,
+  src,
+  ...rest
+}: ImgWithSkeletonProps) {
+  const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
+  // If the image is already cached, mark it loaded synchronously to avoid flash.
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
+  }, [src]);
+  return (
+    <span className={`relative block ${wrapperClassName ?? ""}`}>
+      {!loaded && !errored && (
+        <span
+          aria-hidden
+          className={`absolute inset-0 skeleton-shimmer ${skeletonClassName ?? ""}`}
+        />
+      )}
+      <img
+        ref={imgRef}
+        src={src}
+        className={`${className ?? ""} ${loaded ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}
+        onLoad={(e) => { setLoaded(true); onLoad?.(e); }}
+        onError={(e) => { setErrored(true); setLoaded(true); onError?.(e); }}
+        {...rest}
+      />
+    </span>
+  );
+}
+
 const NAV_LINKS: { href: string; label: string }[] = [
   { href: "#industries", label: "Services" },
   { href: "#industries", label: "Industries" },
@@ -145,6 +193,12 @@ const NAV_LINKS: { href: string; label: string }[] = [
   { href: "#blog", label: "Blog" },
   { href: "#contact", label: "Contact" },
 ];
+
+// Dispatched by header / CTA anchors so the mobile carousel can sync.
+function emitNavTo(hash: string) {
+  if (!hash || !hash.startsWith("#")) return;
+  window.dispatchEvent(new CustomEvent("coresoft:nav", { detail: { hash } }));
+}
 
 function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -167,17 +221,22 @@ function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const handleNavClick = (href: string) => () => {
+    setOpen(false);
+    emitNavTo(href);
+  };
+
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
       <nav className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 md:px-8">
         <Logo />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="hover:text-foreground transition">{l.label}</a>
+            <a key={l.label} href={l.href} onClick={handleNavClick(l.href)} className="hover:text-foreground transition">{l.label}</a>
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <a href="#trial" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
+          <a href="#trial" onClick={handleNavClick("#trial")} className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
             Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
@@ -203,7 +262,7 @@ function Header() {
               <a
                 key={l.label}
                 href={l.href}
-                onClick={() => setOpen(false)}
+                onClick={handleNavClick(l.href)}
                 className="py-3 border-b border-border/30 last:border-b-0 text-base font-semibold text-foreground/90 hover:text-primary transition flex items-center justify-between"
               >
                 {l.label}
@@ -212,7 +271,7 @@ function Header() {
             ))}
             <a
               href="#trial"
-              onClick={() => setOpen(false)}
+              onClick={handleNavClick("#trial")}
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-5 py-3 text-sm font-bold text-primary-foreground shadow-glow"
             >
               Get Audit <ArrowRight className="h-4 w-4" />
@@ -283,14 +342,16 @@ function Hero() {
             className="relative mx-auto w-full max-w-5xl transition-transform duration-200 ease-out will-change-transform"
             style={{ transform: "rotateX(var(--rx)) rotateY(var(--ry)) translate3d(var(--tx),var(--ty),0)" }}
           >
-            <img
+            <ImgWithSkeleton
               src={heroBanner}
               alt="CoreSoft Solutions — premium websites, WhatsApp leads, Google ranking and analytics for local businesses"
               width={1100}
               height={733}
               fetchPriority="high"
               decoding="async"
-              className="block w-full h-auto rounded-3xl shadow-elegant animate-float"
+              wrapperClassName="block w-full rounded-3xl overflow-hidden shadow-elegant animate-float"
+              skeletonClassName="rounded-3xl"
+              className="block w-full h-auto"
               style={{ aspectRatio: "1100 / 733" }}
             />
             <div className="absolute -left-3 md:-left-6 top-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
@@ -642,12 +703,14 @@ function Blog() {
           {articles.map((a) => (
             <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
               <a href={a.href} target="_blank" rel="noopener noreferrer" className="relative block h-48 overflow-hidden" aria-label={a.title}>
-                <img
+                <ImgWithSkeleton
                   src={a.image}
                   alt={a.title}
                   loading="lazy"
                   width={1200}
                   height={800}
+                  wrapperClassName="absolute inset-0"
+                  skeletonClassName=""
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
@@ -902,19 +965,202 @@ function SectionReveal({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** The set of major sections the user can swipe through on mobile. */
+const MOBILE_SLIDES: { id: string; label: string; render: () => JSX.Element }[] = [
+  { id: "stats", label: "Stats", render: () => <Stats /> },
+  { id: "industries", label: "Services", render: () => <Industries /> },
+  { id: "trial", label: "Free Trial", render: () => <FreeTrial /> },
+  { id: "about", label: "About", render: () => <About /> },
+  { id: "testimonials", label: "Testimonials", render: () => <Testimonials /> },
+  { id: "blog", label: "Blog", render: () => <Blog /> },
+  { id: "contact", label: "Contact", render: () => <Contact /> },
+];
+
+function prefersReducedMotion() {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function MobileSectionCarousel() {
+  const reduceMotion = prefersReducedMotion();
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    skipSnaps: false,
+    duration: reduceMotion ? 0 : 25,
+    containScroll: "trimSnaps",
+  });
+  const [selected, setSelected] = useState(0);
+  const [ready, setReady] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Track selected snap
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    // Mark ready on next tick so skeleton can fade out cleanly
+    const t = window.setTimeout(() => setReady(true), 250);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+      window.clearTimeout(t);
+    };
+  }, [emblaApi]);
+
+  // Listen for in-page nav and scroll the carousel to the matching slide.
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onNav = (e: Event) => {
+      const hash = (e as CustomEvent<{ hash: string }>).detail?.hash;
+      if (!hash) return;
+      const id = hash.replace(/^#/, "");
+      const idx = MOBILE_SLIDES.findIndex((s) => s.id === id);
+      if (idx >= 0) {
+        emblaApi.scrollTo(idx, reduceMotion);
+        // Bring the carousel itself into view
+        wrapperRef.current?.scrollIntoView({
+          behavior: reduceMotion ? "auto" : "smooth",
+          block: "start",
+        });
+      }
+    };
+    window.addEventListener("coresoft:nav", onNav as EventListener);
+    return () => window.removeEventListener("coresoft:nav", onNav as EventListener);
+  }, [emblaApi, reduceMotion]);
+
+  // Honor existing #hash on first paint (e.g. /#blog)
+  useEffect(() => {
+    if (!emblaApi) return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const idx = MOBILE_SLIDES.findIndex((s) => s.id === hash.replace(/^#/, ""));
+    if (idx > 0) emblaApi.scrollTo(idx, true);
+  }, [emblaApi]);
+
+  // Delegated: any in-page anchor click (e.g. inline CTAs) should route to the
+  // matching carousel slide instead of triggering a vertical jump.
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const target = (e.target as HTMLElement | null)?.closest("a[href^='#']") as HTMLAnchorElement | null;
+      if (!target) return;
+      const hash = target.getAttribute("href") || "";
+      if (hash.length < 2) return;
+      const id = hash.slice(1);
+      const idx = MOBILE_SLIDES.findIndex((s) => s.id === id);
+      if (idx < 0) return;
+      e.preventDefault();
+      emblaApi.scrollTo(idx, reduceMotion);
+      wrapperRef.current?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [emblaApi, reduceMotion]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+
+  return (
+    <div ref={wrapperRef} aria-roledescription="carousel" aria-label="Page sections">
+      <div className="relative">
+        {/* Skeleton overlay shown briefly until embla initializes */}
+        {!ready && (
+          <div aria-hidden className="px-5 pt-10 pb-6 space-y-4">
+            <Skeleton className="h-6 w-32 skeleton-shimmer" />
+            <Skeleton className="h-12 w-3/4 skeleton-shimmer" />
+            <Skeleton className="h-40 w-full rounded-2xl skeleton-shimmer" />
+            <div className="grid grid-cols-2 gap-3">
+              <Skeleton className="h-24 rounded-2xl skeleton-shimmer" />
+              <Skeleton className="h-24 rounded-2xl skeleton-shimmer" />
+            </div>
+          </div>
+        )}
+
+        <div className={`section-carousel-viewport transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`} ref={emblaRef}>
+          <div className="section-carousel-track">
+            {MOBILE_SLIDES.map((s, i) => (
+              <div
+                key={s.id}
+                className="section-carousel-slide"
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${s.label} (${i + 1} of ${MOBILE_SLIDES.length})`}
+                aria-hidden={i !== selected}
+              >
+                {s.render()}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination + arrows */}
+        <div className="sticky bottom-4 z-30 mx-auto mt-4 flex w-fit items-center gap-3 rounded-full glass px-3 py-2 shadow-card">
+          <button
+            type="button"
+            onClick={scrollPrev}
+            disabled={selected === 0}
+            aria-label="Previous section"
+            className="grid h-8 w-8 place-items-center rounded-full bg-surface-elevated text-foreground/80 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-1.5" role="tablist" aria-label="Section">
+            {MOBILE_SLIDES.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={i === selected}
+                aria-label={`Go to ${s.label}`}
+                onClick={() => emblaApi?.scrollTo(i)}
+                className={`h-2 rounded-full transition-all ${
+                  i === selected ? "w-6 bg-primary" : "w-2 bg-foreground/25 hover:bg-foreground/50"
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={scrollNext}
+            disabled={selected === MOBILE_SLIDES.length - 1}
+            aria-label="Next section"
+            className="grid h-8 w-8 place-items-center rounded-full bg-surface-elevated text-foreground/80 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Index = () => {
+  const isMobile = useIsMobile();
   return (
     <main>
       <Header />
       <Hero />
       <Marquee />
-      <SectionReveal><Stats /></SectionReveal>
-      <SectionReveal><Industries /></SectionReveal>
-      <SectionReveal><FreeTrial /></SectionReveal>
-      <SectionReveal><About /></SectionReveal>
-      <SectionReveal><Testimonials /></SectionReveal>
-      <SectionReveal><Blog /></SectionReveal>
-      <SectionReveal><Contact /></SectionReveal>
+      {isMobile ? (
+        <MobileSectionCarousel />
+      ) : (
+        <>
+          <SectionReveal><Stats /></SectionReveal>
+          <SectionReveal><Industries /></SectionReveal>
+          <SectionReveal><FreeTrial /></SectionReveal>
+          <SectionReveal><About /></SectionReveal>
+          <SectionReveal><Testimonials /></SectionReveal>
+          <SectionReveal><Blog /></SectionReveal>
+          <SectionReveal><Contact /></SectionReveal>
+        </>
+      )}
       <Footer />
       <a
         href={WHATSAPP}

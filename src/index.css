@@ -54,6 +54,8 @@
 @layer base {
   * { @apply border-border; }
   html { scroll-behavior: smooth; }
+  /* Anchor accuracy: offset for the 80px (h-20) fixed header + breathing room */
+  section[id] { scroll-margin-top: 96px; }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Poppins', system-ui, sans-serif;
@@ -63,6 +65,16 @@
   }
   h1, h2, h3, h4 { letter-spacing: -0.025em; }
   .font-mono { font-family: 'DM Mono', ui-monospace, monospace; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .marquee, .animate-float { animation: none !important; }
 }
 
 @layer utilities {
@@ -124,3 +136,30 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-menu-down { animation: menu-down 0.2s ease-out both; }
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted) / 0.4) 0%,
+    hsl(var(--muted) / 0.7) 50%,
+    hsl(var(--muted) / 0.4) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer { animation: none; }
+}
+
+/* Mobile section carousel */
+.section-carousel-viewport { overflow: hidden; }
+.section-carousel-track { display: flex; touch-action: pan-y pinch-zoom; }
+.section-carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
