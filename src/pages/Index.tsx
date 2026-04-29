@@ -138,6 +138,7 @@ function Logo({ className = "h-10" }: { className?: string }) {
       <img src={logoDark} alt="CoreSoft Solutions" className={`${className} w-auto`} width={560} height={160} />
     </a>
   );
+}
 
 type ImgWithSkeletonProps = React.ImgHTMLAttributes<HTMLImageElement> & {
   /** Tailwind classes for the wrapping figure (sizing, rounding, position). */
