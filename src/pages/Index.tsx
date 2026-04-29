@@ -579,21 +579,33 @@ function Blog() {
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {articles.map((a) => (
             <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
-              <div className="relative h-44 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-red opacity-80 group-hover:opacity-100 transition" />
-                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.6), transparent 50%), radial-gradient(circle at 80% 80%, hsl(var(--primary-glow) / 0.6), transparent 50%)" }} />
-                <BookOpen className="absolute right-5 top-5 h-7 w-7 text-primary-foreground/80" aria-hidden />
-                <span className="absolute left-5 bottom-5 rounded-full bg-background/30 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground border border-primary-foreground/20">{a.tag}</span>
-              </div>
+              <a href={a.href} target="_blank" rel="noopener noreferrer" className="relative block h-48 overflow-hidden" aria-label={a.title}>
+                <img
+                  src={a.image}
+                  alt={a.title}
+                  loading="lazy"
+                  width={1200}
+                  height={800}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
+                <div className="absolute inset-0 ring-1 ring-inset ring-primary-foreground/10" aria-hidden />
+                <span className="absolute left-5 bottom-5 rounded-full bg-background/60 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground border border-border/40">{a.tag}</span>
+                <span className="absolute right-5 top-5 grid place-items-center h-9 w-9 rounded-full bg-background/60 backdrop-blur border border-border/40 text-primary">
+                  <BookOpen className="h-4 w-4" aria-hidden />
+                </span>
+              </a>
               <div className="p-7 flex flex-col flex-1">
-                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">{a.title}</h3>
+                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">
+                  <a href={a.href} target="_blank" rel="noopener noreferrer">{a.title}</a>
+                </h3>
                 <p className="mt-3 text-sm text-foreground/70 line-clamp-3">{a.excerpt}</p>
-                <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                <div className="mt-auto pt-6 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
                   <span className="inline-flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {a.date}</span>
                   <span className="inline-flex items-center gap-1.5"><Clock className="h-3 w-3" /> {a.read}</span>
                 </div>
-                <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
-                  Read article <ArrowRight className="h-3.5 w-3.5" />
+                <a href={a.href} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
+                  Read on {a.source} <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             </article>
