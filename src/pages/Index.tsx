@@ -1040,6 +1040,30 @@ function MobileSectionCarousel() {
     if (idx > 0) emblaApi.scrollTo(idx, true);
   }, [emblaApi]);
 
+  // Delegated: any in-page anchor click (e.g. inline CTAs) should route to the
+  // matching carousel slide instead of triggering a vertical jump.
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const target = (e.target as HTMLElement | null)?.closest("a[href^='#']") as HTMLAnchorElement | null;
+      if (!target) return;
+      const hash = target.getAttribute("href") || "";
+      if (hash.length < 2) return;
+      const id = hash.slice(1);
+      const idx = MOBILE_SLIDES.findIndex((s) => s.id === id);
+      if (idx < 0) return;
+      e.preventDefault();
+      emblaApi.scrollTo(idx, reduceMotion);
+      wrapperRef.current?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [emblaApi, reduceMotion]);
+
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
