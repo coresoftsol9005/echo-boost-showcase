@@ -68,27 +68,33 @@ const stats: { target: number; suffix: string; label: string }[] = [
 const articles = [
   {
     tag: "Local SEO",
-    title: "How Hisar restaurants ranked #1 on Google in 30 days",
-    excerpt: "A practical playbook covering Google Business Profile, NAP citations, and review velocity that triples your walk-ins.",
-    date: "Apr 14, 2026",
-    read: "6 min read",
-    href: "#",
+    title: "Google Business Profile for Restaurants: 2025 Ranking Guide",
+    excerpt: "How the Map Pack actually ranks restaurants — categories, NAP, menus, photos, Google Posts and review velocity. The exact playbook used to land #1 for 'restaurant near me' in 30 days.",
+    date: "Apr 18, 2026",
+    read: "9 min read",
+    href: "https://onthemap.agency/blog/google-business-profile-restaurants/",
+    source: "On The Map",
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=70",
   },
   {
     tag: "WhatsApp Marketing",
-    title: "WhatsApp automation that turned 1 lead into 8 bookings",
-    excerpt: "Templates, click-to-chat funnels, and the exact follow-up cadence we use for clinics, salons and boutiques.",
-    date: "Apr 02, 2026",
-    read: "5 min read",
-    href: "#",
+    title: "5 SMBs That Grew 200% with WhatsApp Automation",
+    excerpt: "Real case studies — from a Pakistani solar company tripling qualified leads to a Dubai exporter automating B2B qualification. Templates, funnels and the cadence that actually converts.",
+    date: "Apr 06, 2026",
+    read: "6 min read",
+    href: "https://www.autowa.io/blog/whatsapp-automation-case-studies",
+    source: "AutoWA",
+    image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?auto=format&fit=crop&w=1200&q=70",
   },
   {
     tag: "Web Design",
-    title: "Apple-grade websites for ₹0 down — what's actually inside",
-    excerpt: "A peek at our 7-day starter pack: typography, micro-interactions, and a conversion stack tuned for India.",
-    date: "Mar 21, 2026",
+    title: "Landing Page Design for SMBs in India: A 2025 Guide",
+    excerpt: "Why 70% of small-business websites fail to convert — and the layout, hierarchy, micro-copy and trust signals Indian SMBs need to turn ad clicks into calls, bookings and orders.",
+    date: "Mar 24, 2026",
     read: "8 min read",
-    href: "#",
+    href: "https://www.trifectmedia.in/post/from-clicks-to-customers-designing-landing-pages-that-convert-indian-leads",
+    source: "Trifect Media",
+    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=70",
   },
 ];
 
@@ -573,21 +579,33 @@ function Blog() {
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {articles.map((a) => (
             <article key={a.title} className="group relative overflow-hidden rounded-3xl glass border border-border/40 shadow-card flex flex-col hover:-translate-y-1 hover:border-primary/40 transition">
-              <div className="relative h-44 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-red opacity-80 group-hover:opacity-100 transition" />
-                <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.6), transparent 50%), radial-gradient(circle at 80% 80%, hsl(var(--primary-glow) / 0.6), transparent 50%)" }} />
-                <BookOpen className="absolute right-5 top-5 h-7 w-7 text-primary-foreground/80" aria-hidden />
-                <span className="absolute left-5 bottom-5 rounded-full bg-background/30 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground border border-primary-foreground/20">{a.tag}</span>
-              </div>
+              <a href={a.href} target="_blank" rel="noopener noreferrer" className="relative block h-48 overflow-hidden" aria-label={a.title}>
+                <img
+                  src={a.image}
+                  alt={a.title}
+                  loading="lazy"
+                  width={1200}
+                  height={800}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
+                <div className="absolute inset-0 ring-1 ring-inset ring-primary-foreground/10" aria-hidden />
+                <span className="absolute left-5 bottom-5 rounded-full bg-background/60 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground border border-border/40">{a.tag}</span>
+                <span className="absolute right-5 top-5 grid place-items-center h-9 w-9 rounded-full bg-background/60 backdrop-blur border border-border/40 text-primary">
+                  <BookOpen className="h-4 w-4" aria-hidden />
+                </span>
+              </a>
               <div className="p-7 flex flex-col flex-1">
-                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">{a.title}</h3>
+                <h3 className="text-lg font-black leading-snug group-hover:text-primary transition">
+                  <a href={a.href} target="_blank" rel="noopener noreferrer">{a.title}</a>
+                </h3>
                 <p className="mt-3 text-sm text-foreground/70 line-clamp-3">{a.excerpt}</p>
-                <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                <div className="mt-auto pt-6 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground font-mono uppercase tracking-widest">
                   <span className="inline-flex items-center gap-1.5"><Calendar className="h-3 w-3" /> {a.date}</span>
                   <span className="inline-flex items-center gap-1.5"><Clock className="h-3 w-3" /> {a.read}</span>
                 </div>
-                <a href={a.href} className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
-                  Read article <ArrowRight className="h-3.5 w-3.5" />
+                <a href={a.href} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-foreground group-hover:text-primary transition">
+                  Read on {a.source} <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </div>
             </article>
@@ -616,7 +634,7 @@ function Contact() {
     if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const parsed = leadSchema.safeParse(values);
     if (!parsed.success) {
@@ -630,23 +648,26 @@ function Contact() {
       return;
     }
     setLoading(true);
-    try {
-      const d = parsed.data;
-      const msg =
-        `Hi CoreSoft! 👋\n\n` +
-        `Name: ${d.name}\n` +
-        `Business: ${d.business} (${d.type})\n` +
-        `Phone: ${d.phone}\n\n` +
-        `What I need:\n${d.message}`;
-      await new Promise((r) => setTimeout(r, 600));
-      window.open(`${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
-      toast({ title: "Opening WhatsApp…", description: "We'll reply within 30 minutes." });
-      setValues({ name: "", business: "", type: "Restaurant / Café", phone: "", message: "" });
-    } catch {
-      toast({ title: "Something went wrong", description: "Please WhatsApp us directly.", variant: "destructive" });
-    } finally {
-      setLoading(false);
+    const d = parsed.data;
+    const msg =
+      `Hi CoreSoft! 👋\n\n` +
+      `Name: ${d.name}\n` +
+      `Business: ${d.business} (${d.type})\n` +
+      `Phone: ${d.phone}\n\n` +
+      `What I need:\n${d.message}`;
+    const url = `${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+    // Open synchronously inside the user gesture to avoid popup blockers.
+    const win = window.open(url, "_blank", "noopener,noreferrer");
+    if (!win || win.closed || typeof win.closed === "undefined") {
+      // Popup blocked — navigate current tab as fallback.
+      window.location.href = url;
     }
+
+    toast({ title: "Opening WhatsApp…", description: "We'll reply within 30 minutes." });
+    setValues({ name: "", business: "", type: "Restaurant / Café", phone: "", message: "" });
+    // Brief loading state for visual feedback
+    setTimeout(() => setLoading(false), 400);
   };
 
   const fieldCls = (k: keyof LeadInput) =>
