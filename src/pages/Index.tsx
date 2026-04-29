@@ -131,15 +131,36 @@ function Header() {
 }
 
 function Hero() {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--rx", `${(-y * 6).toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+    el.style.setProperty("--tx", `${(x * 12).toFixed(2)}px`);
+    el.style.setProperty("--ty", `${(y * 12).toFixed(2)}px`);
+  };
+  const onLeave = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    el.style.setProperty("--rx", `0deg`);
+    el.style.setProperty("--ry", `0deg`);
+    el.style.setProperty("--tx", `0px`);
+    el.style.setProperty("--ty", `0px`);
+  };
+
   return (
     <section id="top" className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
-      <div className="absolute inset-0 -z-10 opacity-60" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.35), transparent 70%)" }} />
+      <div className="absolute inset-0 -z-10 opacity-70" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.4), transparent 70%)" }} />
       <div className="mx-auto max-w-6xl px-5 md:px-8 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8 animate-fade-in">
           <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">Hisar · Digital Media · Business Audits</span>
         </div>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight animate-fade-in">
           Innovation for<br />
           <span className="text-gradient-red">every business.</span>
         </h1>
@@ -151,39 +172,65 @@ function Hero() {
           <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
             Get a free audit <ArrowRight className="h-4 w-4" />
           </a>
-          <a href="#stories" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">
+          <a href="#testimonials" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">
             See what we build
           </a>
         </div>
 
-        <div className="relative mt-16 md:mt-20">
-          <div className="absolute inset-x-10 top-10 h-72 bg-gradient-red opacity-30 blur-3xl rounded-full -z-10" />
-          <img
-            src={heroLaptop}
-            alt="CoreSoft premium website displayed on a MacBook"
-            width={1920}
-            height={1080}
-            fetchPriority="high"
-            className="mx-auto w-full max-w-4xl rounded-2xl shadow-elegant animate-float"
-          />
-          <div className="absolute -left-2 top-1/3 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card">
-            <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-red text-primary-foreground">
-              <MessageCircle className="h-5 w-5" />
+        <div
+          ref={wrapRef}
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          className="group relative mt-16 md:mt-20 [perspective:1400px]"
+          style={{ ["--rx" as any]: "0deg", ["--ry" as any]: "0deg", ["--tx" as any]: "0px", ["--ty" as any]: "0px" }}
+        >
+          <div className="absolute inset-x-10 top-10 h-72 bg-gradient-red opacity-40 blur-3xl rounded-full -z-10" />
+          <div
+            className="relative mx-auto w-full max-w-5xl transition-transform duration-200 ease-out will-change-transform"
+            style={{ transform: "rotateX(var(--rx)) rotateY(var(--ry)) translate3d(var(--tx),var(--ty),0)" }}
+          >
+            <img
+              src={heroBanner}
+              alt="CoreSoft Solutions — premium websites, WhatsApp leads, Google ranking and analytics for local businesses"
+              width={1920}
+              height={1280}
+              fetchPriority="high"
+              className="w-full rounded-3xl shadow-elegant animate-float"
+            />
+            <div className="absolute -left-3 md:-left-6 top-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
+              <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-red text-primary-foreground">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <div className="text-left">
+                <div className="text-sm font-bold">+18 leads today</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Live · Hisar</div>
+              </div>
             </div>
-            <div className="text-left">
-              <div className="text-sm font-bold">+18 leads today</div>
-              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Live · Hisar</div>
+            <div className="absolute -right-3 md:-right-6 bottom-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
+              <div className="grid place-items-center h-10 w-10 rounded-xl bg-secondary text-secondary-foreground font-black">4.9</div>
+              <div className="text-left">
+                <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
+                <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Avg client rating</div>
+              </div>
             </div>
-          </div>
-          <div className="absolute -right-2 bottom-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card">
-            <div className="grid place-items-center h-10 w-10 rounded-xl bg-secondary text-secondary-foreground font-black">4.9</div>
-            <div className="text-left">
-              <div className="flex gap-0.5 text-primary">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-3.5 w-3.5 fill-current" />)}</div>
-              <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">Avg client rating</div>
+            <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 hidden md:flex glass rounded-2xl px-5 py-3 gap-4 items-center shadow-card" style={{ transform: "translate(-50%, 0) translateZ(80px)" }}>
+              <div className="text-center">
+                <div className="text-lg font-black text-gradient-red">#1</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Google rank</div>
+              </div>
+              <span className="h-8 w-px bg-border/60" />
+              <div className="text-center">
+                <div className="text-lg font-black">7d</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Delivery</div>
+              </div>
+              <span className="h-8 w-px bg-border/60" />
+              <div className="text-center">
+                <div className="text-lg font-black">3×</div>
+                <div className="font-mono text-[9px] text-muted-foreground uppercase tracking-widest">Growth</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
     </section>
   );
 }
