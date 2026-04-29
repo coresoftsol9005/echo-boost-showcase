@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, ChevronDown } from "lucide-react";
 import { z } from "zod";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
