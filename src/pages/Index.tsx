@@ -342,14 +342,16 @@ function Hero() {
             className="relative mx-auto w-full max-w-5xl transition-transform duration-200 ease-out will-change-transform"
             style={{ transform: "rotateX(var(--rx)) rotateY(var(--ry)) translate3d(var(--tx),var(--ty),0)" }}
           >
-            <img
+            <ImgWithSkeleton
               src={heroBanner}
               alt="CoreSoft Solutions — premium websites, WhatsApp leads, Google ranking and analytics for local businesses"
               width={1100}
               height={733}
               fetchPriority="high"
               decoding="async"
-              className="block w-full h-auto rounded-3xl shadow-elegant animate-float"
+              wrapperClassName="block w-full rounded-3xl overflow-hidden shadow-elegant animate-float"
+              skeletonClassName="rounded-3xl"
+              className="block w-full h-auto"
               style={{ aspectRatio: "1100 / 733" }}
             />
             <div className="absolute -left-3 md:-left-6 top-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
