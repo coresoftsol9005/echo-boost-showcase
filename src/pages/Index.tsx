@@ -229,7 +229,9 @@ function Hero() {
               width={1920}
               height={1280}
               fetchPriority="high"
-              className="w-full rounded-3xl shadow-elegant animate-float"
+              decoding="async"
+              className="block w-full h-auto rounded-3xl shadow-elegant animate-float"
+              style={{ aspectRatio: "1920 / 1280" }}
             />
             <div className="absolute -left-3 md:-left-6 top-1/4 hidden md:flex glass rounded-2xl p-3 pr-4 gap-3 items-center shadow-card hover:scale-105 transition" style={{ transform: "translateZ(60px)" }}>
               <div className="grid place-items-center h-10 w-10 rounded-xl bg-gradient-red text-primary-foreground">
