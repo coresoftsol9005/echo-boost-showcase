@@ -157,7 +157,8 @@ function Header() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   // Lock body scroll when mobile menu is open
@@ -165,26 +166,44 @@ function Header() {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
-  // Close on ESC
+  // Close on ESC + on route hash change
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onHash = () => setOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, [open]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
-      <nav className="mx-auto flex h-24 md:h-28 max-w-6xl items-center justify-between px-5 md:px-8">
-        <Logo />
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled || open ? "glass shadow-[0_8px_30px_-12px_hsl(0_0%_0%/0.5)]" : "bg-transparent"
+      }`}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
+      <nav
+        className={`mx-auto flex max-w-6xl items-center justify-between px-5 md:px-8 transition-[height] duration-300 ${
+          scrolled ? "h-16 md:h-20" : "h-20 md:h-28"
+        }`}
+      >
+        <Logo className={scrolled ? "h-10 md:h-12" : "h-12 md:h-16"} />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="hover:text-foreground transition">{l.label}</a>
+            <a key={l.label} href={l.href} className="hover:text-foreground transition" data-analytics="nav-click" data-event-label={l.label}>{l.label}</a>
           ))}
         </div>
-        <div className="flex items-center gap-3">
-          <a href="#trial" className="btn-shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_25px_60px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300">
-            Get Audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        <div className="flex items-center gap-2">
+          <a
+            href="#trial"
+            onClick={() => track("CTA Click", { location: "header", label: "Get Audit" })}
+            className="btn-shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_25px_60px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300"
+          >
+            Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
             type="button"
@@ -192,40 +211,73 @@ function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex items-center gap-1.5 rounded-full glass px-3.5 py-2.5 text-foreground hover:bg-surface-elevated transition"
+            className="md:hidden relative inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+            <Menu className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
+            <X className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
           </button>
         </div>
       </nav>
-      {open && (
+
+      {/* Mobile full-height menu — slides down from header, dim backdrop below */}
+      <div
+        id="mobile-menu"
+        className={`md:hidden fixed inset-x-0 top-0 origin-top transition-all duration-300 ease-out ${
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!open}
+      >
+        {/* Backdrop */}
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden
+          onClick={() => setOpen(false)}
+          className={`absolute inset-0 bg-background/80 backdrop-blur-md transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
+        />
+        {/* Panel */}
         <div
-          id="mobile-menu"
-          className="md:hidden glass border-t border-border/40 animate-menu-down"
+          className={`relative pt-[calc(env(safe-area-inset-top)+5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)] px-5 transition-transform duration-300 ${
+            open ? "translate-y-0" : "-translate-y-4"
+          }`}
         >
-          <div className="mx-auto max-w-6xl px-5 py-4 flex flex-col">
-            {NAV_LINKS.map((l) => (
+          <nav className="rounded-3xl glass border border-border/40 shadow-elegant overflow-hidden">
+            <ul className="flex flex-col">
+              {NAV_LINKS.map((l, i) => (
+                <li key={l.label} className="border-b border-border/30 last:border-b-0">
+                  <a
+                    href={l.href}
+                    onClick={() => { setOpen(false); track("Nav Click", { label: l.label, location: "mobile" }); }}
+                    style={{ animationDelay: `${i * 40}ms` }}
+                    className="flex items-center justify-between px-6 py-4 text-base font-semibold text-foreground/90 hover:bg-surface-elevated hover:text-primary transition animate-menu-down"
+                  >
+                    <span>{l.label}</span>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="grid grid-cols-2 gap-2 p-4 border-t border-border/30 bg-background/30">
               <a
-                key={l.label}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="py-3 border-b border-border/30 last:border-b-0 text-base font-semibold text-foreground/90 hover:text-primary transition flex items-center justify-between"
+                href={WHATSAPP}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => { setOpen(false); track("WhatsApp Click", { location: "mobile-menu" }); }}
+                className="inline-flex items-center justify-center gap-2 rounded-full glass border border-border/40 px-4 py-3 text-sm font-bold text-foreground"
               >
-                {l.label}
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <MessageCircle className="h-4 w-4" /> WhatsApp
               </a>
-            ))}
-            <a
-              href="#trial"
-              onClick={() => setOpen(false)}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-5 py-3 text-sm font-bold text-primary-foreground shadow-glow"
-            >
-              Get Audit <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
+              <a
+                href="#trial"
+                onClick={() => { setOpen(false); track("CTA Click", { location: "mobile-menu", label: "Get Audit" }); }}
+                className="btn-shine inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-4 py-3 text-sm font-bold text-primary-foreground shadow-glow"
+              >
+                Get Audit <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }
