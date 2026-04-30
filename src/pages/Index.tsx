@@ -908,13 +908,13 @@ const Index = () => {
       <Header />
       <Hero />
       <Marquee />
-      <SectionReveal><Stats /></SectionReveal>
-      <SectionReveal><Industries /></SectionReveal>
-      <SectionReveal><FreeTrial /></SectionReveal>
-      <SectionReveal><About /></SectionReveal>
-      <SectionReveal><Testimonials /></SectionReveal>
-      <SectionReveal><Blog /></SectionReveal>
-      <SectionReveal><Contact /></SectionReveal>
+      <Stats />
+      <Industries />
+      <FreeTrial />
+      <About />
+      <Testimonials />
+      <Blog />
+      <Contact />
       <Footer />
       <a
         href={WHATSAPP}
