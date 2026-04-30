@@ -332,10 +332,10 @@ function Hero() {
           Delivered in <span className="text-foreground font-semibold">7 days</span>. Average <span className="text-foreground font-semibold">3× growth</span>.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#trial" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+          <a href="#trial" onClick={() => track("CTA Click", { location: "hero", label: "Get a free audit" })} className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
             Get a free audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
-          <a href="#testimonials" className="group inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">
+          <a href="#testimonials" onClick={() => track("CTA Click", { location: "hero", label: "See what we build" })} className="group inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">
             See what we build <ArrowRight className="h-4 w-4 opacity-0 -ml-2 transition-all group-hover:opacity-100 group-hover:ml-0" />
           </a>
         </div>
@@ -545,7 +545,7 @@ function FreeTrial() {
               Pehle dekho, phir decide karo. Hum aapke business ke liye complete starter pack 7 din mein build karke denge — bilkul free.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" onClick={() => track("WhatsApp Click", { location: "trial-section", label: "Claim my free week" })} className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
                 Claim my free week <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
               <a href="#contact" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">Talk first</a>
@@ -823,6 +823,9 @@ function Contact() {
       `What I need:\n${d.message}`;
     const url = `${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
+    // Conversion event — fires before opening WhatsApp.
+    track("Lead Submit", { business_type: d.type, location: "contact-form" });
+
     // Open synchronously inside the user gesture to avoid popup blockers.
     const win = window.open(url, "_blank", "noopener,noreferrer");
     if (!win || win.closed || typeof win.closed === "undefined") {
@@ -1025,8 +1028,10 @@ const Index = () => {
         href={WHATSAPP}
         target="_blank"
         rel="noreferrer"
+        onClick={() => track("WhatsApp Click", { location: "fab" })}
         aria-label="Chat on WhatsApp"
         className="group fixed bottom-6 right-6 z-40 grid place-items-center h-14 w-14 rounded-full bg-gradient-red shadow-glow hover:scale-110 transition-all duration-300"
+        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-40" aria-hidden />
         <span className="absolute -inset-1 rounded-full ring-2 ring-primary/40 opacity-0 group-hover:opacity-100 transition" aria-hidden />
