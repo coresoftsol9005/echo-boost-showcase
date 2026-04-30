@@ -409,13 +409,31 @@ function Hero() {
 
 function Marquee() {
   const items = [...businesses, ...businesses];
+  const ref = useRef<HTMLDivElement>(null);
+  // Pause the CSS animation when the marquee is off-screen or the tab is hidden.
+  // This avoids unnecessary compositor work and improves CPU/battery on long pages.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const setRunning = (running: boolean) => {
+      el.style.animationPlayState = running ? "running" : "paused";
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => setRunning(entry.isIntersecting && document.visibilityState === "visible"),
+      { threshold: 0 },
+    );
+    io.observe(el);
+    const onVis = () => setRunning(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVis);
+    return () => { io.disconnect(); document.removeEventListener("visibilitychange", onVis); };
+  }, []);
   return (
     <section aria-label="Businesses scaling with CoreSoft" className="border-y border-border/40 py-8 overflow-hidden bg-surface/40">
       <div className="mx-auto max-w-6xl px-5 md:px-8 mb-6 text-center">
         <p className="eyebrow">Businesses scaling with CoreSoft</p>
       </div>
       <div className="relative flex overflow-hidden">
-        <div className="marquee flex shrink-0 gap-10 pr-10">
+        <div ref={ref} className="marquee flex shrink-0 gap-10 pr-10 will-change-transform">
           {items.map((b, i) => (
             <div key={i} className="flex items-center gap-3 whitespace-nowrap">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
