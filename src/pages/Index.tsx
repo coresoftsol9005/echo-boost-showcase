@@ -129,10 +129,16 @@ const stories = [
   { tag: "Education", quote: "Admission season mein CoreSoft ki digital campaign se 40+ new admissions mile. Website, Facebook ads, aur WhatsApp follow-up — sab kuch ek jagah se manage hua. Superb team!", name: "Neha Gupta", company: "Little Stars Play School", initials: "NG" },
 ];
 
-function Logo({ className = "h-10" }: { className?: string }) {
+function Logo({ className = "h-14 md:h-16" }: { className?: string }) {
   return (
-    <a href="#top" className="inline-flex items-center" aria-label="CoreSoft Solutions home">
-      <img src={logoDark} alt="CoreSoft Solutions" className={`${className} w-auto`} width={560} height={160} />
+    <a href="#top" className="group inline-flex items-center" aria-label="CoreSoft Solutions home">
+      <img
+        src={logoDark}
+        alt="CoreSoft Solutions"
+        className={`${className} w-auto drop-shadow-[0_4px_24px_hsl(var(--primary)/0.35)] transition-transform duration-300 group-hover:scale-[1.04]`}
+        width={560}
+        height={160}
+      />
     </a>
   );
 }
