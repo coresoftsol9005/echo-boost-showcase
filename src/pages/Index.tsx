@@ -175,7 +175,7 @@ function Header() {
 
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
-      <nav className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 md:px-8">
+      <nav className="mx-auto flex h-24 md:h-28 max-w-6xl items-center justify-between px-5 md:px-8">
         <Logo />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
           {NAV_LINKS.map((l) => (
