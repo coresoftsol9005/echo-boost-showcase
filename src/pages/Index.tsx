@@ -473,10 +473,10 @@ function FreeTrial() {
               Pehle dekho, phir decide karo. Hum aapke business ke liye complete starter pack 7 din mein build karke denge — bilkul free.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
-                Claim my free week <ArrowRight className="h-4 w-4" />
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+                Claim my free week <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <a href="#contact" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">Talk first</a>
+              <a href="#contact" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">Talk first</a>
             </div>
           </div>
 
