@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, ChevronDown } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, Plus, Minus } from "lucide-react";
 import { z } from "zod";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
 import { useToast } from "@/hooks/use-toast";
+import { track } from "@/lib/analytics";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
@@ -149,6 +150,7 @@ const NAV_LINKS: { href: string; label: string }[] = [
   { href: "#about", label: "About" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#blog", label: "Blog" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -157,7 +159,8 @@ function Header() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   // Lock body scroll when mobile menu is open
@@ -165,26 +168,44 @@ function Header() {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
-  // Close on ESC
+  // Close on ESC + on route hash change
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onHash = () => setOpen(false);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, [open]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || open ? "glass" : "bg-transparent"}`}>
-      <nav className="mx-auto flex h-24 md:h-28 max-w-6xl items-center justify-between px-5 md:px-8">
-        <Logo />
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled || open ? "glass shadow-[0_8px_30px_-12px_hsl(0_0%_0%/0.5)]" : "bg-transparent"
+      }`}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
+      <nav
+        className={`mx-auto flex max-w-6xl items-center justify-between px-5 md:px-8 transition-[height] duration-300 ${
+          scrolled ? "h-16 md:h-20" : "h-20 md:h-28"
+        }`}
+      >
+        <Logo className={scrolled ? "h-10 md:h-12" : "h-12 md:h-16"} />
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-foreground/80">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="hover:text-foreground transition">{l.label}</a>
+            <a key={l.label} href={l.href} className="hover:text-foreground transition" data-analytics="nav-click" data-event-label={l.label}>{l.label}</a>
           ))}
         </div>
-        <div className="flex items-center gap-3">
-          <a href="#trial" className="btn-shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_25px_60px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300">
-            Get Audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        <div className="flex items-center gap-2">
+          <a
+            href="#trial"
+            onClick={() => track("CTA Click", { location: "header", label: "Get Audit" })}
+            className="btn-shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_25px_60px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300"
+          >
+            Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
             type="button"
@@ -192,40 +213,73 @@ function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex items-center gap-1.5 rounded-full glass px-3.5 py-2.5 text-foreground hover:bg-surface-elevated transition"
+            className="md:hidden relative inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+            <Menu className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
+            <X className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
           </button>
         </div>
       </nav>
-      {open && (
+
+      {/* Mobile full-height menu — slides down from header, dim backdrop below */}
+      <div
+        id="mobile-menu"
+        className={`md:hidden fixed inset-x-0 top-0 origin-top transition-all duration-300 ease-out ${
+          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        aria-hidden={!open}
+      >
+        {/* Backdrop */}
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden
+          onClick={() => setOpen(false)}
+          className={`absolute inset-0 bg-background/80 backdrop-blur-md transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
+        />
+        {/* Panel */}
         <div
-          id="mobile-menu"
-          className="md:hidden glass border-t border-border/40 animate-menu-down"
+          className={`relative pt-[calc(env(safe-area-inset-top)+5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)] px-5 transition-transform duration-300 ${
+            open ? "translate-y-0" : "-translate-y-4"
+          }`}
         >
-          <div className="mx-auto max-w-6xl px-5 py-4 flex flex-col">
-            {NAV_LINKS.map((l) => (
+          <nav className="rounded-3xl glass border border-border/40 shadow-elegant overflow-hidden">
+            <ul className="flex flex-col">
+              {NAV_LINKS.map((l, i) => (
+                <li key={l.label} className="border-b border-border/30 last:border-b-0">
+                  <a
+                    href={l.href}
+                    onClick={() => { setOpen(false); track("Nav Click", { label: l.label, location: "mobile" }); }}
+                    style={{ animationDelay: `${i * 40}ms` }}
+                    className="flex items-center justify-between px-6 py-4 text-base font-semibold text-foreground/90 hover:bg-surface-elevated hover:text-primary transition animate-menu-down"
+                  >
+                    <span>{l.label}</span>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="grid grid-cols-2 gap-2 p-4 border-t border-border/30 bg-background/30">
               <a
-                key={l.label}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="py-3 border-b border-border/30 last:border-b-0 text-base font-semibold text-foreground/90 hover:text-primary transition flex items-center justify-between"
+                href={WHATSAPP}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => { setOpen(false); track("WhatsApp Click", { location: "mobile-menu" }); }}
+                className="inline-flex items-center justify-center gap-2 rounded-full glass border border-border/40 px-4 py-3 text-sm font-bold text-foreground"
               >
-                {l.label}
-                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                <MessageCircle className="h-4 w-4" /> WhatsApp
               </a>
-            ))}
-            <a
-              href="#trial"
-              onClick={() => setOpen(false)}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-5 py-3 text-sm font-bold text-primary-foreground shadow-glow"
-            >
-              Get Audit <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
+              <a
+                href="#trial"
+                onClick={() => { setOpen(false); track("CTA Click", { location: "mobile-menu", label: "Get Audit" }); }}
+                className="btn-shine inline-flex items-center justify-center gap-2 rounded-full bg-gradient-red px-4 py-3 text-sm font-bold text-primary-foreground shadow-glow"
+              >
+                Get Audit <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+          </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }
@@ -279,10 +333,10 @@ function Hero() {
           Delivered in <span className="text-foreground font-semibold">7 days</span>. Average <span className="text-foreground font-semibold">3× growth</span>.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#trial" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+          <a href="#trial" onClick={() => track("CTA Click", { location: "hero", label: "Get a free audit" })} className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
             Get a free audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
-          <a href="#testimonials" className="group inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">
+          <a href="#testimonials" onClick={() => track("CTA Click", { location: "hero", label: "See what we build" })} className="group inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">
             See what we build <ArrowRight className="h-4 w-4 opacity-0 -ml-2 transition-all group-hover:opacity-100 group-hover:ml-0" />
           </a>
         </div>
@@ -356,13 +410,31 @@ function Hero() {
 
 function Marquee() {
   const items = [...businesses, ...businesses];
+  const ref = useRef<HTMLDivElement>(null);
+  // Pause the CSS animation when the marquee is off-screen or the tab is hidden.
+  // This avoids unnecessary compositor work and improves CPU/battery on long pages.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const setRunning = (running: boolean) => {
+      el.style.animationPlayState = running ? "running" : "paused";
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => setRunning(entry.isIntersecting && document.visibilityState === "visible"),
+      { threshold: 0 },
+    );
+    io.observe(el);
+    const onVis = () => setRunning(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVis);
+    return () => { io.disconnect(); document.removeEventListener("visibilitychange", onVis); };
+  }, []);
   return (
     <section aria-label="Businesses scaling with CoreSoft" className="border-y border-border/40 py-8 overflow-hidden bg-surface/40">
       <div className="mx-auto max-w-6xl px-5 md:px-8 mb-6 text-center">
         <p className="eyebrow">Businesses scaling with CoreSoft</p>
       </div>
       <div className="relative flex overflow-hidden">
-        <div className="marquee flex shrink-0 gap-10 pr-10">
+        <div ref={ref} className="marquee flex shrink-0 gap-10 pr-10 will-change-transform">
           {items.map((b, i) => (
             <div key={i} className="flex items-center gap-3 whitespace-nowrap">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
@@ -474,7 +546,7 @@ function FreeTrial() {
               Pehle dekho, phir decide karo. Hum aapke business ke liye complete starter pack 7 din mein build karke denge — bilkul free.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={WHATSAPP} target="_blank" rel="noreferrer" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+              <a href={WHATSAPP} target="_blank" rel="noreferrer" onClick={() => track("WhatsApp Click", { location: "trial-section", label: "Claim my free week" })} className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
                 Claim my free week <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
               <a href="#contact" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">Talk first</a>
@@ -752,6 +824,9 @@ function Contact() {
       `What I need:\n${d.message}`;
     const url = `${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
+    // Conversion event — fires before opening WhatsApp.
+    track("Lead Submit", { business_type: d.type, location: "contact-form" });
+
     // Open synchronously inside the user gesture to avoid popup blockers.
     const win = window.open(url, "_blank", "noopener,noreferrer");
     if (!win || win.closed || typeof win.closed === "undefined") {
@@ -872,6 +947,102 @@ function Contact() {
   );
 }
 
+const FAQS: { q: string; a: string }[] = [
+  { q: "How fast can you deliver my website?", a: "Most 1-page premium websites are designed, built and launched within 7 days from the moment we have your content and brand assets. Larger multi-page builds typically ship in 2–3 weeks." },
+  { q: "How much does a website cost?", a: "Our starter pack is free for the first week (worth ₹24,999) and includes a premium 1-page site, Google Business Profile setup, brand refresh, WhatsApp lead routing, an Instagram reel mockup and a 30-minute strategy call. After that, fixed monthly plans start at ₹4,999 with no lock-in." },
+  { q: "Do you guarantee Google ranking?", a: "We don't sell vague rank promises. We do guarantee a fully optimized Google Business Profile, on-page SEO, local schema, citation building and review velocity — the levers that have put 50+ Hisar businesses into the Map Pack within 30–60 days." },
+  { q: "Will I own my website and content?", a: "Yes. You own your domain, hosting, content, brand assets and Google profile. We hand over full admin access on day one. No vendor lock-in, ever." },
+  { q: "What if I'm not happy with the work?", a: "The first week is free. If the trial doesn't meet your expectations, you walk away — no card, no commitment, no fee. After that, plans are month-to-month and you can cancel anytime." },
+  { q: "Do you work with businesses outside Hisar?", a: "Yes. While we're a Hisar studio, we work with local businesses across Haryana and India — restaurants, clinics, salons, retailers and service businesses. Everything is delivered remotely with WhatsApp updates." },
+];
+
+function FAQ() {
+  const [open, setOpen] = useState<number | null>(0);
+  const toggle = (i: number) => {
+    setOpen((cur) => {
+      const next = cur === i ? null : i;
+      if (next !== null) track("FAQ Open", { question: FAQS[i].q });
+      return next;
+    });
+  };
+  return (
+    <section id="faq" className="py-24 md:py-32" aria-labelledby="faq-heading" itemScope itemType="https://schema.org/FAQPage">
+      <div className="mx-auto max-w-4xl px-5 md:px-8">
+        <div className="text-center">
+          <p className="eyebrow">Frequently Asked</p>
+          <h2 id="faq-heading" className="mt-4 text-4xl md:text-6xl font-black tracking-tight">
+            Quick answers, <span className="text-gradient-red">zero fluff.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-foreground/70">
+            Everything business owners ask before working with us — pricing, timelines, ownership and the free trial.
+          </p>
+        </div>
+
+        <div className="mt-12 rounded-3xl glass border border-border/40 shadow-card overflow-hidden divide-y divide-border/40">
+          {FAQS.map((f, i) => {
+            const isOpen = open === i;
+            const panelId = `faq-panel-${i}`;
+            const btnId = `faq-trigger-${i}`;
+            return (
+              <div
+                key={f.q}
+                itemScope
+                itemProp="mainEntity"
+                itemType="https://schema.org/Question"
+                className={`transition-colors ${isOpen ? "bg-surface-elevated/60" : "hover:bg-surface/40"}`}
+              >
+                <h3 className="m-0">
+                  <button
+                    id={btnId}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => toggle(i)}
+                    className="w-full flex items-center justify-between gap-6 px-6 md:px-8 py-5 md:py-6 text-left"
+                  >
+                    <span itemProp="name" className="text-base md:text-lg font-bold text-foreground">{f.q}</span>
+                    <span className={`shrink-0 grid place-items-center h-9 w-9 rounded-full border transition-all ${isOpen ? "bg-gradient-red text-primary-foreground border-transparent shadow-glow" : "border-border/50 text-foreground/70"}`}>
+                      {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={btnId}
+                  itemScope
+                  itemProp="acceptedAnswer"
+                  itemType="https://schema.org/Answer"
+                  className={`grid transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                >
+                  <div className="overflow-hidden">
+                    <p itemProp="text" className="px-6 md:px-8 pb-6 md:pb-7 text-foreground/75 leading-relaxed">
+                      {f.a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 text-center">
+          <p className="text-sm text-muted-foreground">Still got questions? We reply on WhatsApp in under 30 minutes.</p>
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track("WhatsApp Click", { location: "faq" })}
+            className="btn-shine mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] transition-all duration-300"
+          >
+            <MessageCircle className="h-4 w-4" /> Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="border-t border-border/40 py-14 bg-surface/40">
@@ -949,13 +1120,16 @@ const Index = () => {
       <Testimonials />
       <Blog />
       <Contact />
+      <FAQ />
       <Footer />
       <a
         href={WHATSAPP}
         target="_blank"
         rel="noreferrer"
+        onClick={() => track("WhatsApp Click", { location: "fab" })}
         aria-label="Chat on WhatsApp"
         className="group fixed bottom-6 right-6 z-40 grid place-items-center h-14 w-14 rounded-full bg-gradient-red shadow-glow hover:scale-110 transition-all duration-300"
+        style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       >
         <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-40" aria-hidden />
         <span className="absolute -inset-1 rounded-full ring-2 ring-primary/40 opacity-0 group-hover:opacity-100 transition" aria-hidden />
