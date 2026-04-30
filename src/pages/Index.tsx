@@ -253,30 +253,46 @@ function Hero() {
   };
 
   return (
-    <section id="top" className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
-      <div className="absolute inset-0 -z-10 opacity-70" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.4), transparent 70%)" }} />
+    <section id="top" className="relative overflow-hidden pt-36 pb-20 md:pt-48 md:pb-28">
+      {/* Aurora layers */}
+      <div className="absolute inset-0 -z-10 opacity-80" style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.45), transparent 70%)" }} />
+      <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 -z-10 h-[520px] w-[120%] max-w-none animate-aurora opacity-60"
+        style={{ background: "conic-gradient(from 90deg at 50% 50%, hsl(var(--primary) / 0.35), transparent 30%, hsl(var(--accent) / 0.25) 60%, transparent 80%, hsl(var(--primary) / 0.35))", filter: "blur(60px)" }}
+      />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07]"
+        style={{ backgroundImage: "linear-gradient(hsl(var(--foreground) / 1) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground) / 1) 1px, transparent 1px)", backgroundSize: "44px 44px", maskImage: "radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 75%)", WebkitMaskImage: "radial-gradient(ellipse 60% 50% at 50% 30%, black, transparent 75%)" }}
+      />
       <div className="mx-auto max-w-6xl px-5 md:px-8 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8 animate-fade-in">
-          <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-8 animate-fade-in shadow-card">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-70" />
+            <span className="relative h-2 w-2 rounded-full bg-primary" />
+          </span>
           <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">Hisar · Digital Media · Business Audits</span>
         </div>
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] tracking-tight animate-fade-in">
           Innovation for<br />
-          <span className="text-gradient-red">every business.</span>
+          <span className="text-gradient-red animate-shimmer bg-[length:200%_100%]">every business.</span>
         </h1>
         <p className="mx-auto mt-8 max-w-2xl text-lg md:text-xl text-foreground/70 leading-relaxed">
           Apne business ko digital banaiye — premium websites, Google ranking, aur lead-machines.
           Delivered in <span className="text-foreground font-semibold">7 days</span>. Average <span className="text-foreground font-semibold">3× growth</span>.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#trial" className="inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
-            Get a free audit <ArrowRight className="h-4 w-4" />
+          <a href="#trial" className="btn-shine group inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_30px_70px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300 animate-glow-pulse">
+            Get a free audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
-          <a href="#testimonials" className="inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated transition">
-            See what we build
+          <a href="#testimonials" className="group inline-flex items-center gap-2 rounded-full glass px-7 py-3.5 text-sm font-bold text-foreground hover:bg-surface-elevated hover:border-primary/40 transition">
+            See what we build <ArrowRight className="h-4 w-4 opacity-0 -ml-2 transition-all group-hover:opacity-100 group-hover:ml-0" />
           </a>
         </div>
-
+        {/* Trust micro-row */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground font-mono uppercase tracking-widest">
+          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary" /> 50+ launches</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-accent" /> 4.9★ avg rating</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-secondary" /> 7-day delivery</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-glow" /> 30-min replies</span>
+        </div>
         <div
           ref={wrapRef}
           onMouseMove={onMove}
