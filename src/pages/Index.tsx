@@ -648,6 +648,16 @@ function Blog() {
                   loading="lazy"
                   width={1200}
                   height={800}
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.dataset.fallback) {
+                      img.dataset.fallback = "1";
+                      img.removeAttribute("crossorigin");
+                      img.src = `https://images.weserv.nl/?url=${encodeURIComponent(a.image.replace(/^https?:\/\//, ""))}&w=1200&h=800&fit=cover`;
+                    }
+                  }}
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
