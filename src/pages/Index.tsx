@@ -1119,6 +1119,7 @@ const Index = () => {
       <Testimonials />
       <Blog />
       <Contact />
+      <FAQ />
       <Footer />
       <a
         href={WHATSAPP}
