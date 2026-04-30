@@ -183,8 +183,8 @@ function Header() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <a href="#trial" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.03] transition">
-            Get Audit <ArrowRight className="h-4 w-4" />
+          <a href="#trial" className="btn-shine hidden sm:inline-flex items-center gap-2 rounded-full bg-gradient-red px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] hover:shadow-[0_25px_60px_-15px_hsl(var(--primary)/0.7)] transition-all duration-300">
+            Get Audit <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
           <button
             type="button"
