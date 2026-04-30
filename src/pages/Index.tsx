@@ -425,13 +425,13 @@ function Industries() {
 
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {industries.map((i) => (
-            <article key={i.title} className="group relative overflow-hidden rounded-3xl bg-gradient-card p-8 shadow-card border border-border/40 hover:border-primary/40 transition">
-              <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-primary/20 blur-3xl opacity-0 group-hover:opacity-100 transition" />
-              <div className="text-5xl">{i.icon}</div>
+            <article key={i.title} className="group relative overflow-hidden rounded-3xl bg-gradient-card p-8 shadow-card border border-border/40 hover:border-primary/50 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-20px_hsl(var(--primary)/0.4)] transition-all duration-500">
+              <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-primary/30 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="text-5xl transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">{i.icon}</div>
               <h3 className="mt-6 text-2xl font-black">{i.title}</h3>
               <p className="mt-2 text-foreground/70">{i.line}</p>
               <div className="mt-8 flex items-center gap-4 text-sm">
-                <a href="#contact" className="font-semibold text-foreground hover:text-primary transition inline-flex items-center gap-1.5">Learn more <ArrowRight className="h-3.5 w-3.5" /></a>
+                <a href="#contact" className="font-semibold text-foreground hover:text-primary transition inline-flex items-center gap-1.5 group/link">Learn more <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-1" /></a>
                 <span className="text-muted-foreground">·</span>
                 <a href={WHATSAPP} target="_blank" rel="noreferrer" className="font-semibold text-secondary hover:text-foreground transition">Get a quote</a>
               </div>
@@ -439,14 +439,15 @@ function Industries() {
           ))}
         </div>
 
-        <div className="mt-6 rounded-3xl bg-gradient-red p-8 md:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-glow">
-          <div>
+        <div className="mt-6 rounded-3xl bg-gradient-red p-8 md:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-glow relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 opacity-30 mix-blend-overlay" style={{ background: "radial-gradient(circle at 20% 20%, white, transparent 40%)" }} aria-hidden />
+          <div className="relative">
             <h3 className="text-2xl md:text-3xl font-black text-primary-foreground">Every Other Business</h3>
             <p className="mt-2 text-primary-foreground/90 max-w-xl">
               Built for you. Whatever you do. Retail, services, contractors — agar aap local hain aur grow karna chahte ho, hum aapke liye banayenge.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="relative flex flex-wrap gap-3">
             <a href="#contact" className="inline-flex items-center gap-2 rounded-full bg-background text-foreground px-6 py-3 text-sm font-bold hover:scale-[1.03] transition">Talk to us</a>
             <a href="#trial" className="inline-flex items-center gap-2 rounded-full glass text-primary-foreground px-6 py-3 text-sm font-bold border border-primary-foreground/30 hover:bg-primary-foreground/10 transition">Try free</a>
           </div>
