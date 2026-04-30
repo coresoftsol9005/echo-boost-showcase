@@ -150,6 +150,7 @@ const NAV_LINKS: { href: string; label: string }[] = [
   { href: "#about", label: "About" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#blog", label: "Blog" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
 
