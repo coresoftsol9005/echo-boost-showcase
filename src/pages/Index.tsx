@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, ChevronDown } from "lucide-react";
+import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, Zap, Heart, Loader2, Calendar, Clock, BookOpen, Quote, Menu, X, Plus, Minus } from "lucide-react";
 import { z } from "zod";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
 import { useToast } from "@/hooks/use-toast";
+import { track } from "@/lib/analytics";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
