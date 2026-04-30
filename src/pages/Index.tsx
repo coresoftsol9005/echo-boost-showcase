@@ -946,6 +946,102 @@ function Contact() {
   );
 }
 
+const FAQS: { q: string; a: string }[] = [
+  { q: "How fast can you deliver my website?", a: "Most 1-page premium websites are designed, built and launched within 7 days from the moment we have your content and brand assets. Larger multi-page builds typically ship in 2–3 weeks." },
+  { q: "How much does a website cost?", a: "Our starter pack is free for the first week (worth ₹24,999) and includes a premium 1-page site, Google Business Profile setup, brand refresh, WhatsApp lead routing, an Instagram reel mockup and a 30-minute strategy call. After that, fixed monthly plans start at ₹4,999 with no lock-in." },
+  { q: "Do you guarantee Google ranking?", a: "We don't sell vague rank promises. We do guarantee a fully optimized Google Business Profile, on-page SEO, local schema, citation building and review velocity — the levers that have put 50+ Hisar businesses into the Map Pack within 30–60 days." },
+  { q: "Will I own my website and content?", a: "Yes. You own your domain, hosting, content, brand assets and Google profile. We hand over full admin access on day one. No vendor lock-in, ever." },
+  { q: "What if I'm not happy with the work?", a: "The first week is free. If the trial doesn't meet your expectations, you walk away — no card, no commitment, no fee. After that, plans are month-to-month and you can cancel anytime." },
+  { q: "Do you work with businesses outside Hisar?", a: "Yes. While we're a Hisar studio, we work with local businesses across Haryana and India — restaurants, clinics, salons, retailers and service businesses. Everything is delivered remotely with WhatsApp updates." },
+];
+
+function FAQ() {
+  const [open, setOpen] = useState<number | null>(0);
+  const toggle = (i: number) => {
+    setOpen((cur) => {
+      const next = cur === i ? null : i;
+      if (next !== null) track("FAQ Open", { question: FAQS[i].q });
+      return next;
+    });
+  };
+  return (
+    <section id="faq" className="py-24 md:py-32" aria-labelledby="faq-heading" itemScope itemType="https://schema.org/FAQPage">
+      <div className="mx-auto max-w-4xl px-5 md:px-8">
+        <div className="text-center">
+          <p className="eyebrow">Frequently Asked</p>
+          <h2 id="faq-heading" className="mt-4 text-4xl md:text-6xl font-black tracking-tight">
+            Quick answers, <span className="text-gradient-red">zero fluff.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-foreground/70">
+            Everything business owners ask before working with us — pricing, timelines, ownership and the free trial.
+          </p>
+        </div>
+
+        <div className="mt-12 rounded-3xl glass border border-border/40 shadow-card overflow-hidden divide-y divide-border/40">
+          {FAQS.map((f, i) => {
+            const isOpen = open === i;
+            const panelId = `faq-panel-${i}`;
+            const btnId = `faq-trigger-${i}`;
+            return (
+              <div
+                key={f.q}
+                itemScope
+                itemProp="mainEntity"
+                itemType="https://schema.org/Question"
+                className={`transition-colors ${isOpen ? "bg-surface-elevated/60" : "hover:bg-surface/40"}`}
+              >
+                <h3 className="m-0">
+                  <button
+                    id={btnId}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => toggle(i)}
+                    className="w-full flex items-center justify-between gap-6 px-6 md:px-8 py-5 md:py-6 text-left"
+                  >
+                    <span itemProp="name" className="text-base md:text-lg font-bold text-foreground">{f.q}</span>
+                    <span className={`shrink-0 grid place-items-center h-9 w-9 rounded-full border transition-all ${isOpen ? "bg-gradient-red text-primary-foreground border-transparent shadow-glow" : "border-border/50 text-foreground/70"}`}>
+                      {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    </span>
+                  </button>
+                </h3>
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={btnId}
+                  itemScope
+                  itemProp="acceptedAnswer"
+                  itemType="https://schema.org/Answer"
+                  className={`grid transition-all duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                >
+                  <div className="overflow-hidden">
+                    <p itemProp="text" className="px-6 md:px-8 pb-6 md:pb-7 text-foreground/75 leading-relaxed">
+                      {f.a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 text-center">
+          <p className="text-sm text-muted-foreground">Still got questions? We reply on WhatsApp in under 30 minutes.</p>
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track("WhatsApp Click", { location: "faq" })}
+            className="btn-shine mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-red px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-glow hover:scale-[1.04] transition-all duration-300"
+          >
+            <MessageCircle className="h-4 w-4" /> Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="border-t border-border/40 py-14 bg-surface/40">
