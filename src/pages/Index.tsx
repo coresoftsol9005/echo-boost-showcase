@@ -631,17 +631,33 @@ function FoodTech() {
             return (
               <TiltCard
                 key={p.name}
-                className="group relative rounded-3xl bg-gradient-card border border-border/40 p-5 shadow-card hover:shadow-[0_40px_70px_-20px_hsl(var(--primary)/0.5)] hover:border-primary/60 transition-shadow duration-500 will-change-transform"
+                className="group relative rounded-3xl bg-gradient-card border border-border/40 p-5 shadow-card transition-all duration-500 will-change-transform"
+                style={{
+                  ['--brand' as any]: p.brand,
+                  ['--brand-soft' as any]: p.brandSoft,
+                } as React.CSSProperties}
               >
-                <div
+                <span
                   className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{
-                    background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), hsl(var(--primary)/0.18), transparent 45%)`,
-                  }}
+                  style={{ boxShadow: `0 40px 70px -20px ${p.brandSoft}, inset 0 0 0 1px ${p.brand}` }}
                   aria-hidden
                 />
                 <div
-                  className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center"
+                  className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), ${p.brandSoft}, transparent 45%)`,
+                  }}
+                  aria-hidden
+                />
+                <span
+                  className="absolute -top-2 left-5 z-10 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg"
+                  style={{ background: p.brand, transform: "translateZ(60px)" }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
+                  {p.badge}
+                </span>
+                <div
+                  className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center transition-transform duration-500 group-hover:scale-[1.02]"
                   style={{ background: p.bg, transform: "translateZ(50px)" }}
                 >
                   <span
@@ -650,12 +666,12 @@ function FoodTech() {
                     aria-hidden
                   />
                   <span
-                    className="absolute -bottom-16 -right-16 h-44 w-44 rounded-full blur-2xl opacity-60 pointer-events-none"
+                    className="absolute -bottom-16 -right-16 h-44 w-44 rounded-full blur-2xl opacity-60 pointer-events-none transition-transform duration-700 group-hover:scale-125"
                     style={{ background: p.ring }}
                     aria-hidden
                   />
                   <span
-                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/25 backdrop-blur-sm text-lg shadow-lg"
+                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/25 backdrop-blur-sm text-lg shadow-lg transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-6deg]"
                     style={{ transform: "translateZ(30px)" }}
                     aria-hidden
                   >
@@ -674,8 +690,18 @@ function FoodTech() {
 
                 <div className="mt-5 flex items-start justify-between gap-3" style={{ transform: "translateZ(35px)" }}>
                   <div>
-                    <h3 className="text-lg font-black">{p.name}</h3>
+                    <h3 className="text-lg font-black">
+                      <span className="bg-clip-text transition-all duration-500 group-hover:[background-image:linear-gradient(90deg,var(--brand),hsl(var(--foreground)))] group-hover:text-transparent">
+                        {p.name}
+                      </span>
+                    </h3>
                     <p className="mt-0.5 text-xs text-foreground/65">{p.tag}</p>
+                    <span
+                      className="mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                      style={{ background: p.brandSoft, color: p.brand }}
+                    >
+                      ★ {p.stat}
+                    </span>
                   </div>
                   <a
                     href={WHATSAPP}
@@ -683,7 +709,15 @@ function FoodTech() {
                     rel="noreferrer"
                     onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name })}
                     aria-label={`Onboard on ${p.name}`}
-                    className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-foreground/5 hover:bg-primary hover:text-primary-foreground transition-colors"
+                    className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-foreground/5 transition-all duration-300 group-hover:scale-110"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = p.brand;
+                      e.currentTarget.style.color = "#fff";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "";
+                      e.currentTarget.style.color = "";
+                    }}
                   >
                     <ArrowRight className="h-4 w-4" />
                   </a>
