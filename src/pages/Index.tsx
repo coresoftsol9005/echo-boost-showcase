@@ -529,31 +529,40 @@ function Industries() {
   );
 }
 
-const foodPlatforms = [
-  {
-    name: "Zomato",
-    tag: "Restaurant onboarding",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png",
-    accent: "from-[#E23744] to-[#ff6b6b]",
-  },
-  {
-    name: "Swiggy",
-    tag: "Menu live in 7 days",
-    logo: "https://upload.wikimedia.org/wikipedia/en/1/12/Swiggy_logo.svg",
-    accent: "from-[#FC8019] to-[#ffb066]",
-  },
-  {
-    name: "Blinkit",
-    tag: "10-min grocery listing",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/1/13/Blinkit-yellow-rgb.png",
-    accent: "from-[#F8CB46] to-[#ffe57a]",
-  },
-  {
-    name: "Zepto",
-    tag: "Quick-commerce live",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Zepto_Logo.svg",
-    accent: "from-[#7E2EFF] to-[#b388ff]",
-  },
+// ── Inline brand wordmarks (always render, no hotlink) ──
+const ZomatoMark = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 220 60" className={className} aria-hidden>
+    <text x="0" y="46" fontFamily="'Helvetica Neue', Arial, sans-serif" fontWeight="800" fontSize="52" fill="#ffffff" letterSpacing="-2">zomato</text>
+  </svg>
+);
+const SwiggyMark = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 220 60" className={className} aria-hidden>
+    <text x="0" y="46" fontFamily="'Helvetica Neue', Arial, sans-serif" fontStyle="italic" fontWeight="800" fontSize="52" fill="#ffffff" letterSpacing="-2">Swiggy</text>
+  </svg>
+);
+const BlinkitMark = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 220 60" className={className} aria-hidden>
+    <text x="0" y="46" fontFamily="'Helvetica Neue', Arial, sans-serif" fontWeight="900" fontSize="52" fill="#0c0c0c" letterSpacing="-2">blinkit</text>
+  </svg>
+);
+const ZeptoMark = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 200 60" className={className} aria-hidden>
+    <text x="0" y="46" fontFamily="'Helvetica Neue', Arial, sans-serif" fontWeight="800" fontSize="52" fill="#ffffff" letterSpacing="-2">Zepto</text>
+  </svg>
+);
+
+const foodPlatforms: {
+  name: string;
+  tag: string;
+  bg: string;
+  ring: string;
+  Mark: (p: { className?: string }) => JSX.Element;
+  emoji: string;
+}[] = [
+  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", Mark: ZomatoMark, emoji: "🍛" },
+  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", Mark: SwiggyMark, emoji: "🛵" },
+  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", Mark: BlinkitMark, emoji: "⚡" },
+  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", Mark: ZeptoMark, emoji: "🛒" },
 ];
 
 function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -564,8 +573,8 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
-    const rx = (0.5 - y) * 18;
-    const ry = (x - 0.5) * 22;
+    const rx = (0.5 - y) * 12;
+    const ry = (x - 0.5) * 16;
     el.style.setProperty("--rx", `${rx}deg`);
     el.style.setProperty("--ry", `${ry}deg`);
     el.style.setProperty("--mx", `${x * 100}%`);
@@ -584,9 +593,9 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
       onMouseLeave={onLeave}
       className={className}
       style={{
-        transform: "perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
+        transform: "perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
         transformStyle: "preserve-3d",
-        transition: "transform 200ms ease-out",
+        transition: "transform 250ms ease-out",
       }}
     >
       {children}
@@ -597,7 +606,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
 function FoodTech() {
   return (
     <section id="food-platforms" className="py-24 md:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 opacity-40 pointer-events-none" aria-hidden>
+      <div className="absolute inset-0 -z-10 opacity-50 pointer-events-none" aria-hidden>
         <div className="absolute top-1/3 left-1/4 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
       </div>
@@ -608,56 +617,76 @@ function FoodTech() {
             Go live on <span className="text-gradient-red">Zomato, Swiggy, Blinkit & Zepto.</span>
           </h2>
           <p className="text-foreground/70 max-w-md">
-            Full onboarding done-for-you — paperwork, FSSAI, menu, photography, pricing strategy and ad campaigns. Start receiving orders within 7 days.
+            Done-for-you onboarding — FSSAI, GST, menu engineering, pro photography & launch ads. Start receiving orders within 7 days.
           </p>
         </div>
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 [perspective:1200px]">
-          {foodPlatforms.map((p) => (
-            <TiltCard
-              key={p.name}
-              className="group relative rounded-3xl bg-gradient-card border border-border/40 p-6 shadow-card hover:shadow-[0_30px_60px_-20px_hsl(var(--primary)/0.45)] hover:border-primary/50 transition-shadow duration-500 will-change-transform"
-            >
-              <div
-                className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), hsl(var(--primary)/0.18), transparent 45%)`,
-                }}
-                aria-hidden
-              />
-              <div
-                className={`relative aspect-[4/3] rounded-2xl bg-gradient-to-br ${p.accent} p-8 grid place-items-center overflow-hidden`}
-                style={{ transform: "translateZ(45px)" }}
+        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 [perspective:1300px]">
+          {foodPlatforms.map((p) => {
+            const isLight = p.name === "Blinkit";
+            return (
+              <TiltCard
+                key={p.name}
+                className="group relative rounded-3xl bg-gradient-card border border-border/40 p-5 shadow-card hover:shadow-[0_40px_70px_-20px_hsl(var(--primary)/0.5)] hover:border-primary/60 transition-shadow duration-500 will-change-transform"
               >
-                <span className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/30 blur-2xl" aria-hidden />
-                <img
-                  src={p.logo}
-                  alt={`${p.name} logo`}
-                  loading="lazy"
-                  className="relative max-h-20 w-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110"
-                  style={{ transform: "translateZ(60px)" }}
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), hsl(var(--primary)/0.18), transparent 45%)`,
+                  }}
+                  aria-hidden
                 />
-              </div>
-              <div className="mt-5" style={{ transform: "translateZ(30px)" }}>
-                <h3 className="text-xl font-black">{p.name}</h3>
-                <p className="mt-1 text-sm text-foreground/70">{p.tag}</p>
-              </div>
-              <div className="mt-4 flex items-center justify-between" style={{ transform: "translateZ(30px)" }}>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" /> Live in 7 days
-                </span>
-                <a
-                  href={WHATSAPP}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name })}
-                  className="text-xs font-bold text-foreground hover:text-primary inline-flex items-center gap-1 group/link"
+                <div
+                  className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center"
+                  style={{ background: p.bg, transform: "translateZ(50px)" }}
                 >
-                  Onboard <ArrowRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
-                </a>
-              </div>
-            </TiltCard>
-          ))}
+                  <span
+                    className="absolute inset-x-0 top-0 h-1/2 opacity-60 pointer-events-none"
+                    style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }}
+                    aria-hidden
+                  />
+                  <span
+                    className="absolute -bottom-16 -right-16 h-44 w-44 rounded-full blur-2xl opacity-60 pointer-events-none"
+                    style={{ background: p.ring }}
+                    aria-hidden
+                  />
+                  <span
+                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/25 backdrop-blur-sm text-lg shadow-lg"
+                    style={{ transform: "translateZ(30px)" }}
+                    aria-hidden
+                  >
+                    {p.emoji}
+                  </span>
+                  <p.Mark className="relative h-12 w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110" />
+                  <span
+                    className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                      isLight ? "bg-black/80 text-white" : "bg-white/85 text-black"
+                    }`}
+                    style={{ transform: "translateZ(30px)" }}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+                  </span>
+                </div>
+
+                <div className="mt-5 flex items-start justify-between gap-3" style={{ transform: "translateZ(35px)" }}>
+                  <div>
+                    <h3 className="text-lg font-black">{p.name}</h3>
+                    <p className="mt-0.5 text-xs text-foreground/65">{p.tag}</p>
+                  </div>
+                  <a
+                    href={WHATSAPP}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name })}
+                    aria-label={`Onboard on ${p.name}`}
+                    className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-foreground/5 hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+              </TiltCard>
+            );
+          })}
         </div>
 
         <div className="mt-10 rounded-3xl border border-border/40 bg-gradient-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
