@@ -529,6 +529,162 @@ function Industries() {
   );
 }
 
+const foodPlatforms = [
+  {
+    name: "Zomato",
+    tag: "Restaurant onboarding",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png",
+    accent: "from-[#E23744] to-[#ff6b6b]",
+  },
+  {
+    name: "Swiggy",
+    tag: "Menu live in 7 days",
+    logo: "https://upload.wikimedia.org/wikipedia/en/1/12/Swiggy_logo.svg",
+    accent: "from-[#FC8019] to-[#ffb066]",
+  },
+  {
+    name: "Blinkit",
+    tag: "10-min grocery listing",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/1/13/Blinkit-yellow-rgb.png",
+    accent: "from-[#F8CB46] to-[#ffe57a]",
+  },
+  {
+    name: "Zepto",
+    tag: "Quick-commerce live",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Zepto_Logo.svg",
+    accent: "from-[#7E2EFF] to-[#b388ff]",
+  },
+];
+
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width;
+    const y = (e.clientY - r.top) / r.height;
+    const rx = (0.5 - y) * 18;
+    const ry = (x - 0.5) * 22;
+    el.style.setProperty("--rx", `${rx}deg`);
+    el.style.setProperty("--ry", `${ry}deg`);
+    el.style.setProperty("--mx", `${x * 100}%`);
+    el.style.setProperty("--my", `${y * 100}%`);
+  };
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", `0deg`);
+    el.style.setProperty("--ry", `0deg`);
+  };
+  return (
+    <div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      className={className}
+      style={{
+        transform: "perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
+        transformStyle: "preserve-3d",
+        transition: "transform 200ms ease-out",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function FoodTech() {
+  return (
+    <section id="food-platforms" className="py-24 md:py-32 relative overflow-hidden">
+      <div className="absolute inset-0 -z-10 opacity-40 pointer-events-none" aria-hidden>
+        <div className="absolute top-1/3 left-1/4 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
+      </div>
+      <div className="mx-auto max-w-6xl px-5 md:px-8">
+        <p className="eyebrow">Restaurants & Stores</p>
+        <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight max-w-2xl">
+            Go live on <span className="text-gradient-red">Zomato, Swiggy, Blinkit & Zepto.</span>
+          </h2>
+          <p className="text-foreground/70 max-w-md">
+            Full onboarding done-for-you — paperwork, FSSAI, menu, photography, pricing strategy and ad campaigns. Start receiving orders within 7 days.
+          </p>
+        </div>
+
+        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6 [perspective:1200px]">
+          {foodPlatforms.map((p) => (
+            <TiltCard
+              key={p.name}
+              className="group relative rounded-3xl bg-gradient-card border border-border/40 p-6 shadow-card hover:shadow-[0_30px_60px_-20px_hsl(var(--primary)/0.45)] hover:border-primary/50 transition-shadow duration-500 will-change-transform"
+            >
+              <div
+                className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), hsl(var(--primary)/0.18), transparent 45%)`,
+                }}
+                aria-hidden
+              />
+              <div
+                className={`relative aspect-[4/3] rounded-2xl bg-gradient-to-br ${p.accent} p-8 grid place-items-center overflow-hidden`}
+                style={{ transform: "translateZ(45px)" }}
+              >
+                <span className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-white/30 blur-2xl" aria-hidden />
+                <img
+                  src={p.logo}
+                  alt={`${p.name} logo`}
+                  loading="lazy"
+                  className="relative max-h-20 w-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110"
+                  style={{ transform: "translateZ(60px)" }}
+                />
+              </div>
+              <div className="mt-5" style={{ transform: "translateZ(30px)" }}>
+                <h3 className="text-xl font-black">{p.name}</h3>
+                <p className="mt-1 text-sm text-foreground/70">{p.tag}</p>
+              </div>
+              <div className="mt-4 flex items-center justify-between" style={{ transform: "translateZ(30px)" }}>
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" /> Live in 7 days
+                </span>
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name })}
+                  className="text-xs font-bold text-foreground hover:text-primary inline-flex items-center gap-1 group/link"
+                >
+                  Onboard <ArrowRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
+                </a>
+              </div>
+            </TiltCard>
+          ))}
+        </div>
+
+        <div className="mt-10 rounded-3xl border border-border/40 bg-gradient-card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div>
+            <h3 className="text-xl md:text-2xl font-black">Restaurant or dark-store owner?</h3>
+            <p className="mt-1 text-foreground/70 text-sm md:text-base">FSSAI, GST, menu engineering, pro food photography & first-month ad spend — handled.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => track("CTA Click", { location: "food-platforms-banner" })}
+              className="btn-shine inline-flex items-center gap-2 rounded-full bg-gradient-red text-primary-foreground px-6 py-3 text-sm font-bold shadow-glow hover:scale-[1.03] transition"
+            >
+              <MessageCircle className="h-4 w-4" /> Get me listed
+            </a>
+            <a href="#contact" className="inline-flex items-center gap-2 rounded-full glass px-6 py-3 text-sm font-bold border border-border hover:bg-foreground/5 transition">
+              Talk to a specialist
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FreeTrial() {
   return (
     <section id="trial" className="py-24 md:py-32">
