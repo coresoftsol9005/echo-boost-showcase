@@ -569,7 +569,7 @@ const foodPlatforms: {
   { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, emoji: "🛒" },
 ];
 
-function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function TiltCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   const ref = useRef<HTMLDivElement>(null);
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = ref.current;
@@ -600,6 +600,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
         transform: "perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
         transformStyle: "preserve-3d",
         transition: "transform 250ms ease-out",
+        ...style,
       }}
     >
       {children}
