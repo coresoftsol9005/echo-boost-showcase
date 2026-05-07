@@ -1271,6 +1271,7 @@ const Index = () => {
       <Marquee />
       <Stats />
       <Industries />
+      <FoodTech />
       <FreeTrial />
       <About />
       <Testimonials />
