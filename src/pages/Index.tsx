@@ -563,10 +563,10 @@ const foodPlatforms: {
   Mark: (p: { className?: string }) => JSX.Element;
   emoji: string;
 }[] = [
-  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, emoji: "🍛" },
-  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, emoji: "🛵" },
-  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, emoji: "⚡" },
-  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, emoji: "🛒" },
+  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png", emoji: "🍛" },
+  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, logo: "https://upload.wikimedia.org/wikipedia/en/1/15/Swiggy_logo.svg", emoji: "🛵" },
+  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, logo: "https://upload.wikimedia.org/wikipedia/commons/1/13/Blinkit-yellow-rgb.png", emoji: "⚡" },
+  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, logo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Zepto_Logo.svg", emoji: "🛒" },
 ];
 
 function TiltCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
