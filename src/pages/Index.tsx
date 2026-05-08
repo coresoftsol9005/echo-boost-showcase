@@ -679,7 +679,21 @@ function FoodTech() {
                   >
                     {p.emoji}
                   </span>
-                  <p.Mark className="relative h-12 w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110" />
+                  <img
+                    src={p.logo}
+                    alt={`${p.name} logo`}
+                    loading="lazy"
+                    decoding="async"
+                    className="relative h-14 md:h-16 w-auto max-w-[70%] object-contain drop-shadow-[0_8px_22px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                      // Fallback to inline wordmark if the remote logo fails to load
+                      const img = e.currentTarget;
+                      img.style.display = "none";
+                      const fb = img.nextElementSibling as HTMLElement | null;
+                      if (fb) fb.style.display = "block";
+                    }}
+                  />
+                  <p.Mark className="relative h-12 w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110" style={{ display: "none" } as React.CSSProperties} />
                   <span
                     className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       isLight ? "bg-black/80 text-white" : "bg-white/85 text-black"
