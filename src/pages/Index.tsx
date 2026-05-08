@@ -693,7 +693,9 @@ function FoodTech() {
                       if (fb) fb.style.display = "block";
                     }}
                   />
-                  <p.Mark className="relative h-12 w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110" style={{ display: "none" } as React.CSSProperties} />
+                  <span style={{ display: "none" }} aria-hidden>
+                    <p.Mark className="relative h-12 w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover:scale-110" />
+                  </span>
                   <span
                     className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       isLight ? "bg-black/80 text-white" : "bg-white/85 text-black"
