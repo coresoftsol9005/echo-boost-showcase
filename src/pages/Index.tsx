@@ -561,6 +561,7 @@ const foodPlatforms: {
   badge: string;       // brand-style category badge text
   stat: string;        // social-proof stat
   Mark: (p: { className?: string }) => JSX.Element;
+  logo: string;        // real brand logo URL
   emoji: string;
 }[] = [
   { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png", emoji: "🍛" },
