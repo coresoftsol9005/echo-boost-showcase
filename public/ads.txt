@@ -1,0 +1,5 @@
+# ads.txt for coresoftsolutions.net
+# Authorized Digital Sellers — currently none. Update with entries as
+# direct/reseller relationships are established.
+# Format: <SSP/Exchange domain>, <Publisher Account ID>, <DIRECT|RESELLER>, <Certification Authority ID>
+placeholder.example.com, placeholder, DIRECT
