@@ -666,32 +666,27 @@ function FoodTech() {
                   className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center transition-transform duration-500 group-hover:scale-[1.02]"
                   style={{ background: p.bg, transform: "translateZ(50px)" }}
                 >
+                  <img
+                    src={p.logo}
+                    alt={`${p.name} brand artwork`}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
                   <span
-                    className="absolute inset-x-0 top-0 h-1/2 opacity-60 pointer-events-none"
-                    style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }}
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: `linear-gradient(180deg, transparent 55%, ${p.brand}33 100%)` }}
                     aria-hidden
                   />
                   <span
-                    className="absolute -bottom-16 -right-16 h-44 w-44 rounded-full blur-2xl opacity-60 pointer-events-none transition-transform duration-700 group-hover:scale-125"
-                    style={{ background: p.ring }}
-                    aria-hidden
-                  />
-                  <span
-                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/25 backdrop-blur-sm text-lg shadow-lg transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-6deg]"
+                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/40 backdrop-blur-md text-lg shadow-lg ring-1 ring-white/40 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-6deg]"
                     style={{ transform: "translateZ(30px)" }}
                     aria-hidden
                   >
                     {p.emoji}
                   </span>
                   <span
-                    className="relative grid place-items-center rounded-2xl bg-white/95 px-5 py-3 shadow-[0_10px_30px_-8px_rgba(0,0,0,0.45)] ring-1 ring-black/5 backdrop-blur-sm transition-transform duration-500 group-hover:scale-110"
-                    style={{ transform: "translateZ(40px)" }}
-                    aria-label={`${p.name} logo`}
-                  >
-                    <p.Mark className="h-10 md:h-12 w-auto" />
-                  </span>
-                  <span
-                    className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md ring-1 ring-white/30 ${
                       isLight ? "bg-black/80 text-white" : "bg-white/85 text-black"
                     }`}
                     style={{ transform: "translateZ(30px)" }}
