@@ -3,6 +3,10 @@ import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, 
 import { z } from "zod";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
+import brandZomato from "@/assets/brand-zomato.webp";
+import brandSwiggy from "@/assets/brand-swiggy.png";
+import brandBlinkit from "@/assets/brand-blinkit.jpeg";
+import brandZepto from "@/assets/brand-zepto.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { track } from "@/lib/analytics";
 
@@ -564,10 +568,10 @@ const foodPlatforms: {
   logo: string;        // real brand logo URL
   emoji: string;
 }[] = [
-  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: "https://upload.wikimedia.org/wikipedia/commons/7/75/Zomato_logo.png", emoji: "🍛" },
-  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, logo: "https://upload.wikimedia.org/wikipedia/en/1/15/Swiggy_logo.svg", emoji: "🛵" },
-  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, logo: "https://upload.wikimedia.org/wikipedia/commons/1/13/Blinkit-yellow-rgb.png", emoji: "⚡" },
-  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, logo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Zepto_Logo.svg", emoji: "🛒" },
+  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: brandZomato, emoji: "🍛" },
+  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, logo: brandSwiggy, emoji: "🛵" },
+  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, logo: brandBlinkit, emoji: "⚡" },
+  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, logo: brandZepto, emoji: "🛒" },
 ];
 
 function TiltCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
@@ -662,32 +666,27 @@ function FoodTech() {
                   className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center transition-transform duration-500 group-hover:scale-[1.02]"
                   style={{ background: p.bg, transform: "translateZ(50px)" }}
                 >
+                  <img
+                    src={p.logo}
+                    alt={`${p.name} brand artwork`}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
                   <span
-                    className="absolute inset-x-0 top-0 h-1/2 opacity-60 pointer-events-none"
-                    style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }}
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: `linear-gradient(180deg, transparent 55%, ${p.brand}33 100%)` }}
                     aria-hidden
                   />
                   <span
-                    className="absolute -bottom-16 -right-16 h-44 w-44 rounded-full blur-2xl opacity-60 pointer-events-none transition-transform duration-700 group-hover:scale-125"
-                    style={{ background: p.ring }}
-                    aria-hidden
-                  />
-                  <span
-                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/25 backdrop-blur-sm text-lg shadow-lg transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-6deg]"
+                    className="absolute top-3 left-3 grid place-items-center h-9 w-9 rounded-full bg-white/40 backdrop-blur-md text-lg shadow-lg ring-1 ring-white/40 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:rotate-[-6deg]"
                     style={{ transform: "translateZ(30px)" }}
                     aria-hidden
                   >
                     {p.emoji}
                   </span>
                   <span
-                    className="relative grid place-items-center rounded-2xl bg-white/95 px-5 py-3 shadow-[0_10px_30px_-8px_rgba(0,0,0,0.45)] ring-1 ring-black/5 backdrop-blur-sm transition-transform duration-500 group-hover:scale-110"
-                    style={{ transform: "translateZ(40px)" }}
-                    aria-label={`${p.name} logo`}
-                  >
-                    <p.Mark className="h-10 md:h-12 w-auto" />
-                  </span>
-                  <span
-                    className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                    className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md ring-1 ring-white/30 ${
                       isLight ? "bg-black/80 text-white" : "bg-white/85 text-black"
                     }`}
                     style={{ transform: "translateZ(30px)" }}
