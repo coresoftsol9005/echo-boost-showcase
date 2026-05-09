@@ -637,7 +637,7 @@ function FoodTech() {
             return (
               <TiltCard
                 key={p.name}
-                className="group relative rounded-3xl bg-gradient-card border border-border/40 p-5 shadow-card transition-all duration-500 will-change-transform"
+                className="group relative rounded-3xl bg-gradient-card border border-border/40 p-5 shadow-card transition-all duration-500 will-change-transform hover:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.5)]"
                 style={{
                   ['--brand' as any]: p.brand,
                   ['--brand-soft' as any]: p.brandSoft,
@@ -645,13 +645,20 @@ function FoodTech() {
               >
                 <span
                   className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ boxShadow: `0 40px 70px -20px ${p.brandSoft}, inset 0 0 0 1px ${p.brand}` }}
+                  style={{ boxShadow: `0 50px 90px -25px ${p.brandSoft}, inset 0 0 0 1px ${p.brand}55` }}
                   aria-hidden
                 />
                 <div
                   className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
-                    background: `radial-gradient(420px circle at var(--mx,50%) var(--my,50%), ${p.brandSoft}, transparent 45%)`,
+                    background: `radial-gradient(480px circle at var(--mx,50%) var(--my,50%), ${p.brandSoft}, transparent 55%)`,
+                  }}
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700"
+                  style={{
+                    background: `linear-gradient(180deg, ${p.brandSoft} 0%, transparent 65%)`,
                   }}
                   aria-hidden
                 />
