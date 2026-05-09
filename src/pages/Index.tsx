@@ -666,12 +666,16 @@ function FoodTech() {
                   className="relative aspect-[5/4] rounded-2xl overflow-hidden grid place-items-center transition-transform duration-500 group-hover:scale-[1.02]"
                   style={{ background: p.bg, transform: "translateZ(50px)" }}
                 >
+                  <span
+                    className="absolute inset-3 sm:inset-4 rounded-xl bg-white/95 ring-1 ring-black/5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-sm overflow-hidden"
+                    aria-hidden
+                  />
                   <img
                     src={p.logo}
                     alt={`${p.name} brand artwork`}
                     loading="lazy"
                     decoding="async"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="relative z-[1] max-h-[70%] max-w-[78%] w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105"
                   />
                   <span
                     className="absolute inset-0 pointer-events-none"
