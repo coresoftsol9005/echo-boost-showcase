@@ -3,6 +3,10 @@ import { ArrowRight, Check, MessageCircle, MapPin, Phone, Mail, Star, Sparkles, 
 import { z } from "zod";
 import heroBanner from "@/assets/hero-banner.jpg";
 import logoDark from "@/assets/logo-dark.svg";
+import brandZomato from "@/assets/brand-zomato.webp";
+import brandSwiggy from "@/assets/brand-swiggy.png";
+import brandBlinkit from "@/assets/brand-blinkit.jpeg";
+import brandZepto from "@/assets/brand-zepto.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { track } from "@/lib/analytics";
 
