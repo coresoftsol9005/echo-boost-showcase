@@ -72,34 +72,34 @@ const stats: { target: number; suffix: string; label: string }[] = [
 
 const articles = [
   {
-    tag: "Local SEO",
-    title: "Google Business Profile for Restaurants: 2025 Ranking Guide",
-    excerpt: "How the Map Pack actually ranks restaurants — categories, NAP, menus, photos, Google Posts and review velocity. The exact playbook used to land #1 for 'restaurant near me' in 30 days.",
-    date: "Apr 18, 2026",
-    read: "9 min read",
-    href: "https://onthemap.agency/blog/google-business-profile-restaurants/",
-    source: "On The Map",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=70",
+    tag: "AI Search",
+    title: "Generative Engine Optimization: Ranking in ChatGPT & Perplexity",
+    excerpt: "Google isn't the only search engine anymore. Here's how SMBs are restructuring content, schema and citations so AI answer engines surface their business when customers ask 'best near me'.",
+    date: "May 02, 2026",
+    read: "10 min read",
+    href: "https://searchengineland.com/generative-engine-optimization-geo-guide-447080",
+    source: "Search Engine Land",
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    tag: "WhatsApp Marketing",
-    title: "5 SMBs That Grew 200% with WhatsApp Automation",
-    excerpt: "Real case studies — from a Pakistani solar company tripling qualified leads to a Dubai exporter automating B2B qualification. Templates, funnels and the cadence that actually converts.",
-    date: "Apr 06, 2026",
-    read: "6 min read",
-    href: "https://www.autowa.io/blog/whatsapp-automation-case-studies",
-    source: "AutoWA",
-    image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?auto=format&fit=crop&w=1200&q=70",
+    tag: "Meta Ads",
+    title: "Advantage+ Shopping Campaigns: A 2026 Playbook for Local Brands",
+    excerpt: "Meta's AI-driven Advantage+ is quietly outperforming manual ABO setups for D2C and local retail. Budgets, creative testing cadence, and the exact account structure that scales ROAS past 4x.",
+    date: "Apr 24, 2026",
+    read: "7 min read",
+    href: "https://www.shopify.com/blog/advantage-plus-shopping-campaigns",
+    source: "Shopify",
+    image: "https://images.unsplash.com/photo-1611926653458-09294b3142bf?auto=format&fit=crop&w=1200&q=70",
   },
   {
-    tag: "Web Design",
-    title: "Landing Page Design for SMBs in India: A 2025 Guide",
-    excerpt: "Why 70% of small-business websites fail to convert — and the layout, hierarchy, micro-copy and trust signals Indian SMBs need to turn ad clicks into calls, bookings and orders.",
-    date: "Mar 24, 2026",
+    tag: "Conversion",
+    title: "Core Web Vitals 2026: INP, LCP & What Actually Moves Revenue",
+    excerpt: "Google replaced FID with INP and the bar just got higher. The real-world fixes — image formats, third-party scripts, hydration — that lifted one Indian SMB's conversions by 31%.",
+    date: "Apr 12, 2026",
     read: "8 min read",
-    href: "https://www.trifectmedia.in/post/from-clicks-to-customers-designing-landing-pages-that-convert-indian-leads",
-    source: "Trifect Media",
-    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=70",
+    href: "https://web.dev/articles/inp",
+    source: "web.dev",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=70",
   },
 ];
 
@@ -247,6 +247,15 @@ function Header() {
             open ? "translate-y-0" : "-translate-y-4"
           }`}
         >
+          {/* Floating close button — always visible above backdrop */}
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            className="absolute right-5 top-[calc(env(safe-area-inset-top)+1.25rem)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition shadow-lg"
+          >
+            <X className="h-5 w-5" />
+          </button>
           <nav className="rounded-3xl glass border border-border/40 shadow-elegant overflow-hidden">
             <ul className="flex flex-col">
               {NAV_LINKS.map((l, i) => (
