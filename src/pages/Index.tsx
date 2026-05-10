@@ -247,6 +247,15 @@ function Header() {
             open ? "translate-y-0" : "-translate-y-4"
           }`}
         >
+          {/* Floating close button — always visible above backdrop */}
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+            className="absolute right-5 top-[calc(env(safe-area-inset-top)+1.25rem)] z-10 inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition shadow-lg"
+          >
+            <X className="h-5 w-5" />
+          </button>
           <nav className="rounded-3xl glass border border-border/40 shadow-elegant overflow-hidden">
             <ul className="flex flex-col">
               {NAV_LINKS.map((l, i) => (
