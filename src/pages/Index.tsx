@@ -567,11 +567,12 @@ const foodPlatforms: {
   Mark: (p: { className?: string }) => JSX.Element;
   logo: string;        // real brand logo URL
   emoji: string;
+  url: string;         // platform website
 }[] = [
-  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: brandZomato, emoji: "🍛" },
-  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, logo: brandSwiggy, emoji: "🛵" },
-  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, logo: brandBlinkit, emoji: "⚡" },
-  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, logo: brandZepto, emoji: "🛒" },
+  { name: "Zomato",  tag: "Restaurant onboarding",  bg: "linear-gradient(135deg,#cb202d 0%,#e23744 55%,#ff5a6b 100%)", ring: "#ff8a96", brand: "#e23744", brandSoft: "rgba(226,55,68,0.18)", badge: "Dining Partner", stat: "+38% orders", Mark: ZomatoMark, logo: brandZomato, emoji: "🍛", url: "https://www.zomato.com/partner" },
+  { name: "Swiggy",  tag: "Menu live in 7 days",    bg: "linear-gradient(135deg,#ff5200 0%,#fc8019 55%,#ffb066 100%)", ring: "#ffc89a", brand: "#fc8019", brandSoft: "rgba(252,128,25,0.20)", badge: "Food Partner",   stat: "Top-rated SLA", Mark: SwiggyMark, logo: brandSwiggy, emoji: "🛵", url: "https://partner.swiggy.com/" },
+  { name: "Blinkit", tag: "10-min grocery listing", bg: "linear-gradient(135deg,#f8cb46 0%,#ffd95c 55%,#fff1a8 100%)", ring: "#fff1a8", brand: "#f8cb46", brandSoft: "rgba(248,203,70,0.25)", badge: "Q-Commerce",     stat: "10-min delivery", Mark: BlinkitMark, logo: brandBlinkit, emoji: "⚡", url: "https://blinkit.com/" },
+  { name: "Zepto",   tag: "Quick-commerce live",    bg: "linear-gradient(135deg,#5a13d6 0%,#7e2eff 55%,#b388ff 100%)", ring: "#c8a6ff", brand: "#7e2eff", brandSoft: "rgba(126,46,255,0.20)", badge: "Seller Hub",     stat: "Pan-India reach", Mark: ZeptoMark, logo: brandZepto, emoji: "🛒", url: "https://www.zeptonow.com/" },
 ];
 
 function TiltCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
@@ -709,7 +710,7 @@ function FoodTech() {
                 </div>
 
                 <div className="mt-5 flex items-start justify-between gap-3" style={{ transform: "translateZ(35px)" }}>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-lg font-black">
                       <span className="bg-clip-text transition-all duration-500 group-hover:[background-image:linear-gradient(90deg,var(--brand),hsl(var(--foreground)))] group-hover:text-transparent">
                         {p.name}
@@ -724,22 +725,14 @@ function FoodTech() {
                     </span>
                   </div>
                   <a
-                    href={WHATSAPP}
+                    href={p.url}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name })}
-                    aria-label={`Onboard on ${p.name}`}
-                    className="shrink-0 grid place-items-center h-9 w-9 rounded-full bg-foreground/5 transition-all duration-300 group-hover:scale-110"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = p.brand;
-                      e.currentTarget.style.color = "#fff";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "";
-                      e.currentTarget.style.color = "";
-                    }}
+                    onClick={() => track("CTA Click", { location: "food-platforms", platform: p.name, action: "visit_site" })}
+                    className="shrink-0 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg transition-all duration-300 hover:scale-[1.04] hover:shadow-xl"
+                    style={{ background: p.brand }}
                   >
-                    <ArrowRight className="h-4 w-4" />
+                    Visit <ArrowRight className="h-3.5 w-3.5" />
                   </a>
                 </div>
               </TiltCard>
