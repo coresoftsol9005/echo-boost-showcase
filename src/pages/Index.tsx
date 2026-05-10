@@ -217,7 +217,7 @@ function Header() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="md:hidden relative inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition"
+            className="md:hidden relative z-[70] inline-flex h-11 w-11 items-center justify-center rounded-full glass border border-border/40 text-foreground hover:bg-surface-elevated active:scale-95 transition"
           >
             <Menu className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} />
             <X className={`h-5 w-5 absolute transition-all duration-200 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} />
