@@ -9,6 +9,7 @@ import brandBlinkit from "@/assets/brand-blinkit.jpeg";
 import brandZepto from "@/assets/brand-zepto.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { track } from "@/lib/analytics";
+import ChatBot from "@/components/ChatBot";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
@@ -1428,7 +1429,8 @@ const Index = () => {
         <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-40" aria-hidden />
         <span className="absolute -inset-1 rounded-full ring-2 ring-primary/40 opacity-0 group-hover:opacity-100 transition" aria-hidden />
         <MessageCircle className="relative h-6 w-6 text-primary-foreground" />
-      </a>
+       </a>
+      <ChatBot />
     </main>
   );
 };
