@@ -297,8 +297,9 @@ function Header() {
           onClick={() => setOpen(false)}
           className="absolute inset-0 w-full h-full bg-background/80 backdrop-blur-md"
         />
-        {/* Panel */}
+        {/* Panel — clicks on empty padding area also close the menu */}
         <div
+          onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
           className={`relative pt-[calc(env(safe-area-inset-top)+5rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)] px-5 transition-transform duration-300 ${
             open ? "translate-y-0" : "-translate-y-4"
           }`}
