@@ -161,6 +161,8 @@ const NAV_LINKS: { href: string; label: string }[] = [
 function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -172,16 +174,65 @@ function Header() {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
-  // Close on ESC + on route hash change
+  // Close on ESC + hash change, and trap focus inside the menu while open
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const getFocusable = (): HTMLElement[] => {
+      const root = menuRef.current;
+      if (!root) return [];
+      return Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"]), input, select, textarea'
+        )
+      ).filter((el) => !el.hasAttribute("aria-hidden") && el.offsetParent !== null);
+    };
+
+    // Focus the first focusable element inside the menu on open
+    const focusTimer = window.setTimeout(() => {
+      const focusables = getFocusable();
+      (focusables[0] ?? menuRef.current)?.focus();
+    }, 50);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusables = getFocusable();
+      if (focusables.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const root = menuRef.current;
+      if (!root) return;
+      if (!root.contains(active)) {
+        e.preventDefault();
+        first.focus();
+        return;
+      }
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     const onHash = () => setOpen(false);
     window.addEventListener("keydown", onKey);
     window.addEventListener("hashchange", onHash);
     return () => {
+      window.clearTimeout(focusTimer);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("hashchange", onHash);
+      // Restore focus to the trigger (or previously focused element) when closing
+      (triggerRef.current ?? previouslyFocused)?.focus?.();
     };
   }, [open]);
 
@@ -212,6 +263,7 @@ function Header() {
             Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -228,6 +280,10 @@ function Header() {
       {/* Mobile full-height menu — slides down from header, dim backdrop below */}
       <div
         id="mobile-menu"
+        ref={menuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Main menu"
         className={`md:hidden fixed inset-0 z-40 origin-top transition-opacity duration-300 ease-out ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
