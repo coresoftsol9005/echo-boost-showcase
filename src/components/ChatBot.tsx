@@ -122,14 +122,14 @@ export default function ChatBot() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Open chat"}
-        className="fixed bottom-24 right-6 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="fixed bottom-5 right-5 z-50 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
       </button>
 
       <div
         className={cn(
-          "fixed bottom-44 right-6 z-50 w-[min(380px,calc(100vw-3rem))] h-[min(560px,calc(100vh-12rem))] origin-bottom-right transition-all duration-200",
+          "fixed bottom-24 right-5 z-50 w-[min(380px,calc(100vw-2.5rem))] h-[min(560px,calc(100vh-8rem))] origin-bottom-right transition-all duration-200",
           open ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0",
         )}
         aria-hidden={!open}
