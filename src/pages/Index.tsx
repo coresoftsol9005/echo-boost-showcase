@@ -263,6 +263,7 @@ function Header() {
             Get Audit <ArrowRight className="h-4 w-4" />
           </a>
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -279,6 +280,10 @@ function Header() {
       {/* Mobile full-height menu — slides down from header, dim backdrop below */}
       <div
         id="mobile-menu"
+        ref={menuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Main menu"
         className={`md:hidden fixed inset-0 z-40 origin-top transition-opacity duration-300 ease-out ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
