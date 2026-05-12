@@ -164,10 +164,26 @@ function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    let ticking = false;
+    let rafId = 0;
+    const update = () => {
+      ticking = false;
+      setScrolled((prev) => {
+        const next = window.scrollY > 20;
+        return prev === next ? prev : next;
+      });
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      rafId = window.requestAnimationFrame(update);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    update();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.cancelAnimationFrame(rafId);
+    };
   }, []);
   // Lock body scroll when mobile menu is open
   useEffect(() => {
