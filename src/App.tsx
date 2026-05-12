@@ -16,6 +16,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <CinematicLayer />
       <BrowserRouter>
         <Suspense fallback={null}>
           <Routes>
