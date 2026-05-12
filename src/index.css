@@ -252,17 +252,26 @@ section#top h1 {
   text-shadow: 0 0 40px rgba(144,202,249,0.3);
 }
 
-/* Navbar enhancement */
-header.glass, header > nav {
-  /* preserve existing */
+/* Navbar — transparent → opaque on scroll, blur + bordered */
+header[class*="fixed"] {
+  background-color: rgba(10, 22, 40, 0);
+  backdrop-filter: blur(0px) saturate(180%);
+  -webkit-backdrop-filter: blur(0px) saturate(180%);
+  border-bottom: 1px solid rgba(61, 90, 128, 0);
+  box-shadow: 0 1px 30px rgba(5, 14, 26, 0);
+  transition:
+    background-color 0.35s ease,
+    backdrop-filter 0.35s ease,
+    -webkit-backdrop-filter 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
 }
-header {
-  border-bottom: 1px solid rgba(61,90,128,0.0);
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-header.glass, header:has(.glass) {
-  border-bottom: 1px solid rgba(61,90,128,0.4);
-  box-shadow: 0 1px 30px rgba(5,14,26,0.8);
+header[class*="fixed"].glass {
+  background-color: rgba(10, 22, 40, 0.85) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(61, 90, 128, 0.4);
+  box-shadow: 0 1px 30px rgba(5, 14, 26, 0.8);
 }
 
 /* Logo wordmark glow (apply to images) */
