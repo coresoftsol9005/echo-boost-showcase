@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import CinematicLayer from "./components/CinematicLayer";
 
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -15,6 +16,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <CinematicLayer />
       <BrowserRouter>
         <Suspense fallback={null}>
           <Routes>
