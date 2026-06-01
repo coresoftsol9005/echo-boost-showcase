@@ -273,6 +273,7 @@ export default function CinematicLayer() {
         <div ref={progressRef} className="cine-progress-bar" />
       </div>
       {/* Cursor */}
+      <div ref={ringRef} id="cine-cursor-ring" aria-hidden />
       <div ref={cursorRef} id="cine-cursor" aria-hidden />
       <div ref={dotRef} id="cine-cursor-dot" aria-hidden />
       {/* SVG noise filter */}
