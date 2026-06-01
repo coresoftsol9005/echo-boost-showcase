@@ -314,6 +314,19 @@ html.cinematic-cursor * { cursor: none !important; }
 @media (prefers-reduced-motion: reduce) {
   #cine-cursor-ring { display: none; }
 }
+/* Low-end devices: drop the expensive drop-shadow filter (rasterizes every frame) */
+#cine-cursor-ring.is-lowend {
+  filter: none;
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(229, 57, 53, 0) 0deg,
+      rgba(229, 57, 53, 0.85) 70deg,
+      rgba(144, 202, 249, 0.85) 180deg,
+      rgba(144, 202, 249, 0) 290deg,
+      rgba(229, 57, 53, 0) 360deg
+    );
+}
 
 /* Section reveal */
 .cine-section {

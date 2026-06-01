@@ -134,6 +134,14 @@ export default function CinematicLayer() {
 
     document.documentElement.classList.add("cinematic-cursor");
 
+    // Detect low-end device — drop the expensive glow filter & throttle ring updates
+    const lowEnd =
+      (navigator as any).hardwareConcurrency != null &&
+      (navigator as any).hardwareConcurrency <= 4;
+    const deviceMemory = (navigator as any).deviceMemory;
+    const veryLowEnd = lowEnd && deviceMemory != null && deviceMemory <= 4;
+    if (lowEnd) ring.classList.add("is-lowend");
+
     // Positions
     let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
     let cx = tx, cy = ty;        // smoothed ring/circle
@@ -144,6 +152,8 @@ export default function CinematicLayer() {
     let scrollIntensity = 0;     // 0..1 — how "active" the spiral is
     let lastScrollY = window.scrollY;
     let scrollTimer: number | undefined;
+    let ringOpacity = 0;         // tracked locally to avoid style reads
+    let ringMounted = false;     // skip ring writes while fully idle+hidden
 
     const onMove = (e: MouseEvent) => {
       tx = e.clientX;
@@ -152,20 +162,33 @@ export default function CinematicLayer() {
 
     const onScroll = () => {
       const y = window.scrollY;
-      const dy2 = y - lastScrollY;
+      const delta = y - lastScrollY;
       lastScrollY = y;
       // Map scroll delta to angular velocity (deg per frame target)
-      scrollSpin = Math.max(-24, Math.min(24, dy2 * 0.6));
+      const cap = veryLowEnd ? 16 : 24;
+      scrollSpin = Math.max(-cap, Math.min(cap, delta * 0.6));
       scrollIntensity = 1;
-      ring.style.opacity = "1";
       if (scrollTimer) window.clearTimeout(scrollTimer);
       scrollTimer = window.setTimeout(() => {
         scrollIntensity = 0;
       }, 180);
     };
 
+    // Frame-rate cap (60fps target on low-end, otherwise uncapped)
+    const minFrameMs = veryLowEnd ? 1000 / 30 : 0;
+    let lastFrame = 0;
     let raf = 0;
-    const tick = () => {
+    // Last-written values so we can skip redundant style writes
+    let lastCurX = NaN, lastCurY = NaN, lastCurS = NaN;
+    let lastDotX = NaN, lastDotY = NaN;
+    let lastRingX = NaN, lastRingY = NaN, lastRingR = NaN, lastRingS = NaN;
+    let lastOpacityWritten = -1;
+
+    const tick = (t: number) => {
+      raf = requestAnimationFrame(tick);
+      if (minFrameMs > 0 && t - lastFrame < minFrameMs) return;
+      lastFrame = t;
+
       // Smooth follow
       const ease = 0.22;
       cx += (tx - cx) * ease;
@@ -176,26 +199,63 @@ export default function CinematicLayer() {
       // Scale ease
       scale += (scaleTarget - scale) * 0.18;
 
-      // Spiral rotation
-      // Idle: slow drift. Scrolling: fast spin proportional to delta.
-      rot += scrollIntensity > 0 ? scrollSpin : 0.6;
-      // Decay spin toward idle
+      // Cursor write (skip if movement is sub-pixel & scale unchanged)
+      if (
+        Math.abs(cx - lastCurX) > 0.05 ||
+        Math.abs(cy - lastCurY) > 0.05 ||
+        Math.abs(scale - lastCurS) > 0.005
+      ) {
+        cursor.style.transform = `translate3d(${cx - 6}px, ${cy - 6}px, 0) scale(${scale.toFixed(3)})`;
+        lastCurX = cx; lastCurY = cy; lastCurS = scale;
+      }
+      if (Math.abs(dx - lastDotX) > 0.05 || Math.abs(dy - lastDotY) > 0.05) {
+        dot.style.transform = `translate3d(${dx - 2}px, ${dy - 2}px, 0)`;
+        lastDotX = dx; lastDotY = dy;
+      }
+
+      if (reduced) return;
+
+      // Decay spin every frame
       scrollSpin *= 0.88;
 
-      // Ring scale grows while scrolling for "loading" feel
+      // Track local opacity (fade out when idle, snap to 1 when scrolling)
+      if (scrollIntensity > 0) {
+        ringOpacity = 1;
+      } else if (ringOpacity > 0) {
+        ringOpacity = Math.max(0, ringOpacity - 0.04);
+      }
+
+      // Skip ring work entirely while idle and invisible
+      if (ringOpacity <= 0 && Math.abs(scrollSpin) < 0.01) {
+        if (ringMounted) {
+          ring.style.opacity = "0";
+          lastOpacityWritten = 0;
+          ringMounted = false;
+        }
+        return;
+      }
+      ringMounted = true;
+
+      // Spiral rotation — only advance when needed
+      rot += scrollIntensity > 0 ? scrollSpin : 0.6;
+      // Keep rot bounded to avoid float drift after long sessions
+      if (rot > 1e6 || rot < -1e6) rot = rot % 360;
+
       const ringScale = 0.6 + scrollIntensity * 0.55 + (scale - 1) * 0.4;
 
-      cursor.style.transform = `translate3d(${cx - 6}px, ${cy - 6}px, 0) scale(${scale})`;
-      dot.style.transform = `translate3d(${dx - 2}px, ${dy - 2}px, 0)`;
-      if (!reduced) {
-        ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) rotate(${rot}deg) scale(${ringScale})`;
-        // Fade out smoothly when idle
-        if (scrollIntensity === 0 && parseFloat(ring.style.opacity || "0") > 0.02) {
-          const cur = parseFloat(ring.style.opacity || "1");
-          ring.style.opacity = String(Math.max(0, cur - 0.04));
-        }
+      if (
+        Math.abs(cx - lastRingX) > 0.1 ||
+        Math.abs(cy - lastRingY) > 0.1 ||
+        Math.abs(rot - lastRingR) > 0.25 ||
+        Math.abs(ringScale - lastRingS) > 0.005
+      ) {
+        ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) rotate(${rot.toFixed(2)}deg) scale(${ringScale.toFixed(3)})`;
+        lastRingX = cx; lastRingY = cy; lastRingR = rot; lastRingS = ringScale;
       }
-      raf = requestAnimationFrame(tick);
+      if (Math.abs(ringOpacity - lastOpacityWritten) > 0.02) {
+        ring.style.opacity = ringOpacity.toFixed(2);
+        lastOpacityWritten = ringOpacity;
+      }
     };
     raf = requestAnimationFrame(tick);
 
