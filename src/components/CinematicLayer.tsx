@@ -11,6 +11,7 @@ export default function CinematicLayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
 
   // Three.js hero background
@@ -122,47 +123,102 @@ export default function CinematicLayer() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Custom cursor (desktop only)
+  // Custom cursor (desktop only) — smooth lerp + scroll-driven spiral
   useEffect(() => {
     if (isMobile()) return;
     const cursor = cursorRef.current;
     const dot = dotRef.current;
-    if (!cursor || !dot) return;
+    const ring = ringRef.current;
+    if (!cursor || !dot || !ring) return;
+    const reduced = prefersReducedMotion();
 
     document.documentElement.classList.add("cinematic-cursor");
 
-    let cx = 0, cy = 0, tx = 0, ty = 0;
+    // Positions
+    let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+    let cx = tx, cy = ty;        // smoothed ring/circle
+    let dx = tx, dy = ty;        // dot (near-instant)
+    let scale = 1, scaleTarget = 1;
+    let rot = 0;                 // spiral rotation
+    let scrollSpin = 0;          // current scroll-driven angular velocity
+    let scrollIntensity = 0;     // 0..1 — how "active" the spiral is
+    let lastScrollY = window.scrollY;
+    let scrollTimer: number | undefined;
+
     const onMove = (e: MouseEvent) => {
       tx = e.clientX;
       ty = e.clientY;
-      dot.style.transform = `translate(${tx - 2}px, ${ty - 2}px)`;
     };
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy2 = y - lastScrollY;
+      lastScrollY = y;
+      // Map scroll delta to angular velocity (deg per frame target)
+      scrollSpin = Math.max(-24, Math.min(24, dy2 * 0.6));
+      scrollIntensity = 1;
+      ring.style.opacity = "1";
+      if (scrollTimer) window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        scrollIntensity = 0;
+      }, 180);
+    };
+
     let raf = 0;
     const tick = () => {
-      cx += (tx - cx) * 0.2;
-      cy += (ty - cy) * 0.2;
-      cursor.style.transform = `translate(${cx - 6}px, ${cy - 6}px) scale(var(--cur-scale, 1))`;
+      // Smooth follow
+      const ease = 0.22;
+      cx += (tx - cx) * ease;
+      cy += (ty - cy) * ease;
+      // Dot tracks faster
+      dx += (tx - dx) * 0.55;
+      dy += (ty - dy) * 0.55;
+      // Scale ease
+      scale += (scaleTarget - scale) * 0.18;
+
+      // Spiral rotation
+      // Idle: slow drift. Scrolling: fast spin proportional to delta.
+      rot += scrollIntensity > 0 ? scrollSpin : 0.6;
+      // Decay spin toward idle
+      scrollSpin *= 0.88;
+
+      // Ring scale grows while scrolling for "loading" feel
+      const ringScale = 0.6 + scrollIntensity * 0.55 + (scale - 1) * 0.4;
+
+      cursor.style.transform = `translate3d(${cx - 6}px, ${cy - 6}px, 0) scale(${scale})`;
+      dot.style.transform = `translate3d(${dx - 2}px, ${dy - 2}px, 0)`;
+      if (!reduced) {
+        ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) rotate(${rot}deg) scale(${ringScale})`;
+        // Fade out smoothly when idle
+        if (scrollIntensity === 0 && parseFloat(ring.style.opacity || "0") > 0.02) {
+          const cur = parseFloat(ring.style.opacity || "1");
+          ring.style.opacity = String(Math.max(0, cur - 0.04));
+        }
+      }
       raf = requestAnimationFrame(tick);
     };
-    tick();
+    raf = requestAnimationFrame(tick);
 
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
       if (t.closest("a, button, [role='button']")) {
-        cursor.style.setProperty("--cur-scale", "2");
+        scaleTarget = 2;
         cursor.style.borderColor = "#E53935";
       } else {
-        cursor.style.setProperty("--cur-scale", "1");
+        scaleTarget = 1;
         cursor.style.borderColor = "#90CAF9";
       }
     };
 
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseover", onOver);
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseover", onOver, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
+      if (scrollTimer) window.clearTimeout(scrollTimer);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
+      window.removeEventListener("scroll", onScroll);
       document.documentElement.classList.remove("cinematic-cursor");
     };
   }, []);
@@ -217,6 +273,7 @@ export default function CinematicLayer() {
         <div ref={progressRef} className="cine-progress-bar" />
       </div>
       {/* Cursor */}
+      <div ref={ringRef} id="cine-cursor-ring" aria-hidden />
       <div ref={cursorRef} id="cine-cursor" aria-hidden />
       <div ref={dotRef} id="cine-cursor-dot" aria-hidden />
       {/* SVG noise filter */}
