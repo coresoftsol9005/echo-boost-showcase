@@ -311,10 +311,9 @@ export default function CinematicLayer() {
       <div className="cine-progress-track" aria-hidden>
         <div ref={progressRef} className="cine-progress-bar" />
       </div>
-      {/* Cursor */}
-      <div ref={ringRef} id="cine-cursor-ring" aria-hidden />
-      <div ref={cursorRef} id="cine-cursor" aria-hidden />
-      <div ref={dotRef} id="cine-cursor-dot" aria-hidden />
+      {/* Cursor (canvas-rendered spiral + dot) */}
+      <canvas ref={cursorCanvasRef} id="cine-cursor-canvas" aria-hidden />
+
       {/* SVG noise filter */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
         <filter id="cine-noise">
