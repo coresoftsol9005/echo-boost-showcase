@@ -10,10 +10,9 @@ const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
 
 export default function CinematicLayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  const cursorCanvasRef = useRef<HTMLCanvasElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+
 
   // Three.js hero background
   useEffect(() => {
