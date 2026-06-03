@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -9,10 +10,9 @@ const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
 
 export default function CinematicLayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
+  const cursorCanvasRef = useRef<HTMLCanvasElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+
 
   // Three.js hero background
   useEffect(() => {
@@ -123,152 +123,129 @@ export default function CinematicLayer() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Custom cursor (desktop only) — smooth lerp + scroll-driven spiral
+  // Custom cursor (desktop only) — canvas-rendered spiral + dot for smooth GPU paint
   useEffect(() => {
     if (isMobile()) return;
-    const cursor = cursorRef.current;
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-    if (!cursor || !dot || !ring) return;
+    const canvas = cursorCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
     const reduced = prefersReducedMotion();
 
     document.documentElement.classList.add("cinematic-cursor");
 
-    // Detect low-end device — drop the expensive glow filter & throttle ring updates
-    const lowEnd =
-      (navigator as any).hardwareConcurrency != null &&
-      (navigator as any).hardwareConcurrency <= 4;
-    const deviceMemory = (navigator as any).deviceMemory;
-    const veryLowEnd = lowEnd && deviceMemory != null && deviceMemory <= 4;
-    if (lowEnd) ring.classList.add("is-lowend");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const resize = () => {
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener("resize", resize);
 
     // Positions
     let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
-    let cx = tx, cy = ty;        // smoothed ring/circle
-    let dx = tx, dy = ty;        // dot (near-instant)
+    let cx = tx, cy = ty;      // smoothed ring
+    let dx = tx, dy = ty;      // dot (fast)
     let scale = 1, scaleTarget = 1;
-    let rot = 0;                 // spiral rotation
-    let scrollSpin = 0;          // current scroll-driven angular velocity
-    let scrollIntensity = 0;     // 0..1 — how "active" the spiral is
+    let hoverAccent = false;
+    let rot = 0;
+    let scrollSpin = 0;
+    let scrollIntensity = 0;
     let lastScrollY = window.scrollY;
     let scrollTimer: number | undefined;
-    let ringOpacity = 0;         // tracked locally to avoid style reads
-    let ringMounted = false;     // skip ring writes while fully idle+hidden
 
-    const onMove = (e: MouseEvent) => {
-      tx = e.clientX;
-      ty = e.clientY;
-    };
-
+    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY; };
     const onScroll = () => {
       const y = window.scrollY;
       const delta = y - lastScrollY;
       lastScrollY = y;
-      // Map scroll delta to angular velocity (deg per frame target)
-      const cap = veryLowEnd ? 16 : 24;
-      scrollSpin = Math.max(-cap, Math.min(cap, delta * 0.6));
+      scrollSpin = Math.max(-24, Math.min(24, delta * 0.6));
       scrollIntensity = 1;
       if (scrollTimer) window.clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(() => {
-        scrollIntensity = 0;
-      }, 180);
+      scrollTimer = window.setTimeout(() => { scrollIntensity = 0; }, 220);
     };
-
-    // Frame-rate cap (60fps target on low-end, otherwise uncapped)
-    const minFrameMs = veryLowEnd ? 1000 / 30 : 0;
-    let lastFrame = 0;
-    let raf = 0;
-    // Last-written values so we can skip redundant style writes
-    let lastCurX = NaN, lastCurY = NaN, lastCurS = NaN;
-    let lastDotX = NaN, lastDotY = NaN;
-    let lastRingX = NaN, lastRingY = NaN, lastRingR = NaN, lastRingS = NaN;
-    let lastOpacityWritten = -1;
-
-    const tick = (t: number) => {
-      raf = requestAnimationFrame(tick);
-      if (minFrameMs > 0 && t - lastFrame < minFrameMs) return;
-      lastFrame = t;
-
-      // Smooth follow
-      const ease = 0.22;
-      cx += (tx - cx) * ease;
-      cy += (ty - cy) * ease;
-      // Dot tracks faster
-      dx += (tx - dx) * 0.55;
-      dy += (ty - dy) * 0.55;
-      // Scale ease
-      scale += (scaleTarget - scale) * 0.18;
-
-      // Cursor write (skip if movement is sub-pixel & scale unchanged)
-      if (
-        Math.abs(cx - lastCurX) > 0.05 ||
-        Math.abs(cy - lastCurY) > 0.05 ||
-        Math.abs(scale - lastCurS) > 0.005
-      ) {
-        cursor.style.transform = `translate3d(${cx - 6}px, ${cy - 6}px, 0) scale(${scale.toFixed(3)})`;
-        lastCurX = cx; lastCurY = cy; lastCurS = scale;
-      }
-      if (Math.abs(dx - lastDotX) > 0.05 || Math.abs(dy - lastDotY) > 0.05) {
-        dot.style.transform = `translate3d(${dx - 2}px, ${dy - 2}px, 0)`;
-        lastDotX = dx; lastDotY = dy;
-      }
-
-      if (reduced) return;
-
-      // Decay spin every frame
-      scrollSpin *= 0.88;
-
-      // Track local opacity (fade out when idle, snap to 1 when scrolling)
-      if (scrollIntensity > 0) {
-        ringOpacity = 1;
-      } else if (ringOpacity > 0) {
-        ringOpacity = Math.max(0, ringOpacity - 0.04);
-      }
-
-      // Skip ring work entirely while idle and invisible
-      if (ringOpacity <= 0 && Math.abs(scrollSpin) < 0.01) {
-        if (ringMounted) {
-          ring.style.opacity = "0";
-          lastOpacityWritten = 0;
-          ringMounted = false;
-        }
-        return;
-      }
-      ringMounted = true;
-
-      // Spiral rotation — only advance when needed
-      rot += scrollIntensity > 0 ? scrollSpin : 0.6;
-      // Keep rot bounded to avoid float drift after long sessions
-      if (rot > 1e6 || rot < -1e6) rot = rot % 360;
-
-      const ringScale = 0.6 + scrollIntensity * 0.55 + (scale - 1) * 0.4;
-
-      if (
-        Math.abs(cx - lastRingX) > 0.1 ||
-        Math.abs(cy - lastRingY) > 0.1 ||
-        Math.abs(rot - lastRingR) > 0.25 ||
-        Math.abs(ringScale - lastRingS) > 0.005
-      ) {
-        ring.style.transform = `translate3d(${cx}px, ${cy}px, 0) rotate(${rot.toFixed(2)}deg) scale(${ringScale.toFixed(3)})`;
-        lastRingX = cx; lastRingY = cy; lastRingR = rot; lastRingS = ringScale;
-      }
-      if (Math.abs(ringOpacity - lastOpacityWritten) > 0.02) {
-        ring.style.opacity = ringOpacity.toFixed(2);
-        lastOpacityWritten = ringOpacity;
-      }
-    };
-    raf = requestAnimationFrame(tick);
-
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      if (t.closest("a, button, [role='button']")) {
-        scaleTarget = 2;
-        cursor.style.borderColor = "#E53935";
-      } else {
-        scaleTarget = 1;
-        cursor.style.borderColor = "#90CAF9";
+      hoverAccent = !!t.closest?.("a, button, [role='button']");
+      scaleTarget = hoverAccent ? 1.8 : 1;
+    };
+
+    let raf = 0;
+    const W = () => window.innerWidth;
+    const H = () => window.innerHeight;
+
+    const drawSpiral = (x: number, y: number, baseR: number, rotation: number, intensity: number) => {
+      // Spiral made of arc segments — fast to draw, looks like a 3D ribbon
+      const turns = 1.4;
+      const segs = 48;
+      const startR = baseR * 0.35;
+      const endR = baseR * (1 + intensity * 0.35);
+      const rad = (rotation * Math.PI) / 180;
+      ctx.lineCap = "round";
+      for (let i = 0; i < segs; i++) {
+        const tNorm = i / (segs - 1);
+        const a0 = rad + tNorm * turns * Math.PI * 2;
+        const a1 = rad + ((i + 1) / (segs - 1)) * turns * Math.PI * 2;
+        const r0 = startR + (endR - startR) * tNorm;
+        const r1 = startR + (endR - startR) * ((i + 1) / (segs - 1));
+        const x0 = x + Math.cos(a0) * r0;
+        const y0 = y + Math.sin(a0) * r0;
+        const x1 = x + Math.cos(a1) * r1;
+        const y1 = y + Math.sin(a1) * r1;
+        // Color shifts from accent red -> blue along the spiral
+        const r = Math.round(229 + (144 - 229) * tNorm);
+        const g = Math.round(57 + (202 - 57) * tNorm);
+        const b = Math.round(53 + (249 - 53) * tNorm);
+        const alpha = (0.25 + tNorm * 0.75) * (0.5 + intensity * 0.5);
+        ctx.strokeStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+        ctx.lineWidth = 1 + tNorm * 1.6;
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
       }
     };
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+
+      // Smoothing
+      cx += (tx - cx) * 0.22;
+      cy += (ty - cy) * 0.22;
+      dx += (tx - dx) * 0.55;
+      dy += (ty - dy) * 0.55;
+      scale += (scaleTarget - scale) * 0.18;
+      scrollSpin *= 0.9;
+      rot += scrollIntensity > 0 ? scrollSpin : 0.5;
+      if (rot > 1e6 || rot < -1e6) rot = rot % 360;
+
+      ctx.clearRect(0, 0, W(), H());
+
+      // Outer ring (always visible — this IS the cursor)
+      const ringR = 14 * scale;
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = hoverAccent ? "rgba(229,57,53,0.95)" : "rgba(144,202,249,0.9)";
+      ctx.stroke();
+
+      // Spiral overlay during scroll
+      if (!reduced && scrollIntensity > 0.02) {
+        drawSpiral(cx, cy, 26 + scale * 6, rot, scrollIntensity);
+      } else if (!reduced && Math.abs(scrollSpin) > 0.05) {
+        drawSpiral(cx, cy, 26 + scale * 6, rot, Math.min(1, Math.abs(scrollSpin) / 4));
+      }
+
+      // Dot
+      ctx.beginPath();
+      ctx.arc(dx, dy, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#E53935";
+      ctx.fill();
+    };
+    raf = requestAnimationFrame(tick);
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
@@ -279,9 +256,11 @@ export default function CinematicLayer() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", resize);
       document.documentElement.classList.remove("cinematic-cursor");
     };
   }, []);
+
 
   // Section reveal
   useEffect(() => {
@@ -332,10 +311,9 @@ export default function CinematicLayer() {
       <div className="cine-progress-track" aria-hidden>
         <div ref={progressRef} className="cine-progress-bar" />
       </div>
-      {/* Cursor */}
-      <div ref={ringRef} id="cine-cursor-ring" aria-hidden />
-      <div ref={cursorRef} id="cine-cursor" aria-hidden />
-      <div ref={dotRef} id="cine-cursor-dot" aria-hidden />
+      {/* Cursor (canvas-rendered spiral + dot) */}
+      <canvas ref={cursorCanvasRef} id="cine-cursor-canvas" aria-hidden />
+
       {/* SVG noise filter */}
       <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
         <filter id="cine-noise">
