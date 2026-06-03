@@ -224,13 +224,35 @@ export default function CinematicLayer() {
 
       ctx.clearRect(0, 0, W(), H());
 
+      // Pulsing halo on interactive hover — clear "clickable" affordance
+      const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 280);
+      if (hoverAccent) {
+        // Soft outer halo
+        const haloR = 22 + pulse * 4;
+        const grad = ctx.createRadialGradient(cx, cy, haloR * 0.4, cx, cy, haloR);
+        grad.addColorStop(0, "rgba(229,57,53,0.28)");
+        grad.addColorStop(1, "rgba(229,57,53,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, haloR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // Outer ring (always visible — this IS the cursor)
       const ringR = 14 * scale;
       ctx.beginPath();
       ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = hoverAccent ? 2 : 1.5;
       ctx.strokeStyle = hoverAccent ? "rgba(229,57,53,0.95)" : "rgba(144,202,249,0.9)";
       ctx.stroke();
+
+      // "Click" indicator: small inner filled disc when hovering interactive
+      if (hoverAccent) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5 + pulse * 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(229,57,53,0.9)";
+        ctx.fill();
+      }
 
       // Spiral overlay during scroll
       if (!reduced && scrollIntensity > 0.02) {
@@ -238,6 +260,7 @@ export default function CinematicLayer() {
       } else if (!reduced && Math.abs(scrollSpin) > 0.05) {
         drawSpiral(cx, cy, 26 + scale * 6, rot, Math.min(1, Math.abs(scrollSpin) / 4));
       }
+
 
       // Dot
       ctx.beginPath();
