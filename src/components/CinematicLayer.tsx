@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
