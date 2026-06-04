@@ -272,6 +272,7 @@ function Header() {
           ))}
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <a
             href="#trial"
             onClick={() => track("CTA Click", { location: "header", label: "Get Audit" })}
