@@ -113,6 +113,7 @@ export default function CinematicLayer() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      themeObserver.disconnect();
       renderer.dispose();
       pGeom.dispose();
       pMat.dispose();
