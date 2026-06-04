@@ -248,12 +248,15 @@ export default function CinematicLayer() {
     const tick = () => {
       raf = requestAnimationFrame(tick);
 
-      // Smoothing
-      cx += (tx - cx) * 0.22;
-      cy += (ty - cy) * 0.22;
-      dx += (tx - dx) * 0.55;
-      dy += (ty - dy) * 0.55;
-      scale += (scaleTarget - scale) * 0.18;
+      // Smoothing — gentler lerp when keyboard-focused so quick Tab sweeps glide
+      const ringLerp = focusActive ? 0.14 : 0.22;
+      const dotLerp = focusActive ? 0.18 : 0.55;
+      // Critically-damped easing approximation: ease distance, not just position
+      cx += (tx - cx) * ringLerp;
+      cy += (ty - cy) * ringLerp;
+      dx += (tx - dx) * dotLerp;
+      dy += (ty - dy) * dotLerp;
+      scale += (scaleTarget - scale) * (focusActive ? 0.1 : 0.18);
       scrollSpin *= 0.9;
       rot += scrollIntensity > 0 ? scrollSpin : 0.5;
       if (rot > 1e6 || rot < -1e6) rot = rot % 360;
