@@ -218,19 +218,27 @@
   100% { transform: translate(0,0); }
 }
 
-/* Cinematic vignette */
+/* Cinematic vignette — dark theme */
 .cine-vignette {
   position: fixed;
   inset: 0;
   z-index: 9996;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(5,14,26,0.55) 90%, #050e1a 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, hsl(var(--background) / 0.55) 90%, hsl(var(--background)) 100%);
 }
+.light .cine-vignette {
+  background: radial-gradient(ellipse at center, transparent 50%, hsl(var(--background) / 0.4) 95%, hsl(var(--background)) 100%);
+}
+.light .cine-grain { mix-blend-mode: multiply; opacity: 0.04; }
 
 /* Layered atmospheric body bg */
 body {
   background-image:
-    radial-gradient(ellipse at 30% 50%, #0d1f3c 0%, #0A1628 60%, #050e1a 100%) !important;
+    radial-gradient(ellipse at 30% 50%, hsl(215 60% 14%) 0%, hsl(215 65% 8%) 60%, hsl(215 70% 5%) 100%);
+}
+.light body, html.light body {
+  background-image:
+    radial-gradient(ellipse at 30% 50%, hsl(210 50% 99%) 0%, hsl(210 40% 96%) 60%, hsl(210 35% 92%) 100%);
 }
 
 /* Scroll progress bar */
