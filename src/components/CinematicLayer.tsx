@@ -98,9 +98,22 @@ export default function CinematicLayer() {
     };
     window.addEventListener("resize", onResize);
 
+    // Adapt particle/ring colors to theme
+    const applyThemeColors = () => {
+      const light = document.documentElement.classList.contains("light");
+      pMat.color.setHex(light ? 0x1e3a5f : 0x90caf9);
+      pMat.opacity = light ? 0.45 : 0.85;
+      ringMat.color.setHex(light ? 0x90a8c0 : 0x3d5a80);
+      ringMat.opacity = light ? 0.12 : 0.07;
+    };
+    applyThemeColors();
+    const themeObserver = new MutationObserver(applyThemeColors);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      themeObserver.disconnect();
       renderer.dispose();
       pGeom.dispose();
       pMat.dispose();

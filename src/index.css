@@ -67,8 +67,8 @@
     --primary-foreground: 0 0% 100%;
     --primary-glow: 354 84% 58%;
 
-    --secondary: 215 30% 94%;
-    --secondary-foreground: 215 65% 10%;
+    --secondary: 215 35% 35%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 215 25% 92%;
     --muted-foreground: 215 18% 38%;
@@ -120,10 +120,10 @@
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-card { box-shadow: var(--shadow-card); }
   .glass {
-    background: hsl(215 55% 11% / 0.6);
+    background: hsl(var(--surface) / 0.6);
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid hsl(354 92% 92% / 0.08);
+    border: 1px solid hsl(var(--border));
   }
   .eyebrow {
     @apply font-mono text-[11px] uppercase tracking-[0.25em] text-secondary;
@@ -218,19 +218,27 @@
   100% { transform: translate(0,0); }
 }
 
-/* Cinematic vignette */
+/* Cinematic vignette — dark theme */
 .cine-vignette {
   position: fixed;
   inset: 0;
   z-index: 9996;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(5,14,26,0.55) 90%, #050e1a 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, hsl(var(--background) / 0.55) 90%, hsl(var(--background)) 100%);
 }
+.light .cine-vignette {
+  background: radial-gradient(ellipse at center, transparent 50%, hsl(var(--background) / 0.4) 95%, hsl(var(--background)) 100%);
+}
+.light .cine-grain { mix-blend-mode: multiply; opacity: 0.04; }
 
 /* Layered atmospheric body bg */
 body {
   background-image:
-    radial-gradient(ellipse at 30% 50%, #0d1f3c 0%, #0A1628 60%, #050e1a 100%) !important;
+    radial-gradient(ellipse at 30% 50%, hsl(215 60% 14%) 0%, hsl(215 65% 8%) 60%, hsl(215 70% 5%) 100%);
+}
+.light body, html.light body {
+  background-image:
+    radial-gradient(ellipse at 30% 50%, hsl(210 50% 99%) 0%, hsl(210 40% 96%) 60%, hsl(210 35% 92%) 100%);
 }
 
 /* Scroll progress bar */
@@ -286,11 +294,11 @@ section#top h1 {
 
 /* Navbar — transparent → opaque on scroll, blur + bordered */
 header[class*="fixed"] {
-  background-color: rgba(10, 22, 40, 0);
+  background-color: hsl(var(--background) / 0);
   backdrop-filter: blur(0px) saturate(180%);
   -webkit-backdrop-filter: blur(0px) saturate(180%);
-  border-bottom: 1px solid rgba(61, 90, 128, 0);
-  box-shadow: 0 1px 30px rgba(5, 14, 26, 0);
+  border-bottom: 1px solid transparent;
+  box-shadow: 0 1px 30px transparent;
   transition:
     background-color 0.35s ease,
     backdrop-filter 0.35s ease,
@@ -299,11 +307,11 @@ header[class*="fixed"] {
     box-shadow 0.35s ease;
 }
 header[class*="fixed"].glass {
-  background-color: rgba(10, 22, 40, 0.85) !important;
+  background-color: hsl(var(--background) / 0.85) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(61, 90, 128, 0.4);
-  box-shadow: 0 1px 30px rgba(5, 14, 26, 0.8);
+  border-bottom: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 30px hsl(var(--background) / 0.5);
 }
 
 /* Logo wordmark glow (apply to images) */
@@ -327,12 +335,12 @@ section + section::before {
 [class*="rounded-3xl"][class*="border"]:not(button):not(a),
 [class*="rounded-2xl"][class*="border"]:not(button):not(a) {
   position: relative;
-  background: linear-gradient(135deg, rgba(13,31,60,0.9) 0%, rgba(10,22,40,0.95) 100%);
-  border: 1px solid rgba(61,90,128,0.35);
+  background: var(--gradient-card);
+  border: 1px solid hsl(var(--border));
   backdrop-filter: blur(16px);
   box-shadow:
-    0 4px 24px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(144,202,249,0.08);
+    var(--shadow-card),
+    inset 0 1px 0 hsl(var(--accent) / 0.08);
   transition: all 0.35s cubic-bezier(0.23,1,0.32,1);
 }
 [class*="rounded-3xl"][class*="border"]:not(button):not(a)::before,
@@ -386,8 +394,8 @@ a.glass:hover, button.glass:hover {
 /* Footer ambient orbs */
 footer {
   position: relative;
-  background: linear-gradient(180deg, #0A1628 0%, #050e1a 100%);
-  border-top: 1px solid rgba(61,90,128,0.5);
+  background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.95) 100%);
+  border-top: 1px solid hsl(var(--border));
   overflow: hidden;
 }
 footer::before, footer::after, footer > .cine-orb {
