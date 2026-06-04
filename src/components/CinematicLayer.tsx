@@ -151,14 +151,46 @@ export default function CinematicLayer() {
     let dx = tx, dy = ty;      // dot (fast)
     let scale = 1, scaleTarget = 1;
     let hoverAccent = false;
+    let focusActive = false;
+    let focusedEl: HTMLElement | null = null;
     let rot = 0;
     let scrollSpin = 0;
     let scrollIntensity = 0;
     let lastScrollY = window.scrollY;
     let scrollTimer: number | undefined;
 
-    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY; };
+    const updateFocusTarget = () => {
+      if (!focusedEl || !document.contains(focusedEl)) {
+        focusActive = false;
+        return;
+      }
+      const r = focusedEl.getBoundingClientRect();
+      tx = r.left + r.width / 2;
+      ty = r.top + r.height / 2;
+      scaleTarget = 1.8;
+    };
+
+    const onMove = (e: MouseEvent) => {
+      focusActive = false;
+      focusedEl = null;
+      tx = e.clientX; ty = e.clientY;
+    };
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t || !t.matches?.("a, button, input, select, textarea, [role='button'], [tabindex]:not([tabindex='-1'])")) return;
+      focusedEl = t;
+      focusActive = true;
+      hoverAccent = true;
+      updateFocusTarget();
+    };
+    const onFocusOut = () => {
+      focusActive = false;
+      focusedEl = null;
+      hoverAccent = false;
+      scaleTarget = 1;
+    };
     const onScroll = () => {
+      if (focusActive) updateFocusTarget();
       const y = window.scrollY;
       const delta = y - lastScrollY;
       lastScrollY = y;
@@ -168,9 +200,13 @@ export default function CinematicLayer() {
       scrollTimer = window.setTimeout(() => { scrollIntensity = 0; }, 220);
     };
     const onOver = (e: MouseEvent) => {
+      if (focusActive) return;
       const t = e.target as HTMLElement;
       hoverAccent = !!t.closest?.("a, button, [role='button']");
       scaleTarget = hoverAccent ? 1.8 : 1;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab" && focusActive) updateFocusTarget();
     };
 
     let raf = 0;
@@ -273,12 +309,19 @@ export default function CinematicLayer() {
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("focusout", onFocusOut);
+    window.addEventListener("keyup", onKey);
+    window.addEventListener("resize", () => { if (focusActive) updateFocusTarget(); });
     return () => {
       cancelAnimationFrame(raf);
       if (scrollTimer) window.clearTimeout(scrollTimer);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("focusout", onFocusOut);
+      window.removeEventListener("keyup", onKey);
       window.removeEventListener("resize", resize);
       document.documentElement.classList.remove("cinematic-cursor");
     };
