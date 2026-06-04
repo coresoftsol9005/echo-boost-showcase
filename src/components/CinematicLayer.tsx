@@ -309,12 +309,19 @@ export default function CinematicLayer() {
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("focusin", onFocusIn);
+    window.addEventListener("focusout", onFocusOut);
+    window.addEventListener("keyup", onKey);
+    window.addEventListener("resize", () => { if (focusActive) updateFocusTarget(); });
     return () => {
       cancelAnimationFrame(raf);
       if (scrollTimer) window.clearTimeout(scrollTimer);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("focusout", onFocusOut);
+      window.removeEventListener("keyup", onKey);
       window.removeEventListener("resize", resize);
       document.documentElement.classList.remove("cinematic-cursor");
     };
