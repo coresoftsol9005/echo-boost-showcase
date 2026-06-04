@@ -151,14 +151,46 @@ export default function CinematicLayer() {
     let dx = tx, dy = ty;      // dot (fast)
     let scale = 1, scaleTarget = 1;
     let hoverAccent = false;
+    let focusActive = false;
+    let focusedEl: HTMLElement | null = null;
     let rot = 0;
     let scrollSpin = 0;
     let scrollIntensity = 0;
     let lastScrollY = window.scrollY;
     let scrollTimer: number | undefined;
 
-    const onMove = (e: MouseEvent) => { tx = e.clientX; ty = e.clientY; };
+    const updateFocusTarget = () => {
+      if (!focusedEl || !document.contains(focusedEl)) {
+        focusActive = false;
+        return;
+      }
+      const r = focusedEl.getBoundingClientRect();
+      tx = r.left + r.width / 2;
+      ty = r.top + r.height / 2;
+      scaleTarget = 1.8;
+    };
+
+    const onMove = (e: MouseEvent) => {
+      focusActive = false;
+      focusedEl = null;
+      tx = e.clientX; ty = e.clientY;
+    };
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t || !t.matches?.("a, button, input, select, textarea, [role='button'], [tabindex]:not([tabindex='-1'])")) return;
+      focusedEl = t;
+      focusActive = true;
+      hoverAccent = true;
+      updateFocusTarget();
+    };
+    const onFocusOut = () => {
+      focusActive = false;
+      focusedEl = null;
+      hoverAccent = false;
+      scaleTarget = 1;
+    };
     const onScroll = () => {
+      if (focusActive) updateFocusTarget();
       const y = window.scrollY;
       const delta = y - lastScrollY;
       lastScrollY = y;
