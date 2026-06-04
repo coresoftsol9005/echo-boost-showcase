@@ -9,6 +9,7 @@ import brandBlinkit from "@/assets/brand-blinkit.jpeg";
 import brandZepto from "@/assets/brand-zepto.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { track } from "@/lib/analytics";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const leadSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name too long"),
