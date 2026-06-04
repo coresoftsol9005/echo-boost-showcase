@@ -294,11 +294,11 @@ section#top h1 {
 
 /* Navbar — transparent → opaque on scroll, blur + bordered */
 header[class*="fixed"] {
-  background-color: rgba(10, 22, 40, 0);
+  background-color: hsl(var(--background) / 0);
   backdrop-filter: blur(0px) saturate(180%);
   -webkit-backdrop-filter: blur(0px) saturate(180%);
-  border-bottom: 1px solid rgba(61, 90, 128, 0);
-  box-shadow: 0 1px 30px rgba(5, 14, 26, 0);
+  border-bottom: 1px solid transparent;
+  box-shadow: 0 1px 30px transparent;
   transition:
     background-color 0.35s ease,
     backdrop-filter 0.35s ease,
@@ -307,11 +307,11 @@ header[class*="fixed"] {
     box-shadow 0.35s ease;
 }
 header[class*="fixed"].glass {
-  background-color: rgba(10, 22, 40, 0.85) !important;
+  background-color: hsl(var(--background) / 0.85) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(61, 90, 128, 0.4);
-  box-shadow: 0 1px 30px rgba(5, 14, 26, 0.8);
+  border-bottom: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 30px hsl(var(--background) / 0.5);
 }
 
 /* Logo wordmark glow (apply to images) */
