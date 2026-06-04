@@ -200,9 +200,13 @@ export default function CinematicLayer() {
       scrollTimer = window.setTimeout(() => { scrollIntensity = 0; }, 220);
     };
     const onOver = (e: MouseEvent) => {
+      if (focusActive) return;
       const t = e.target as HTMLElement;
       hoverAccent = !!t.closest?.("a, button, [role='button']");
       scaleTarget = hoverAccent ? 1.8 : 1;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab" && focusActive) updateFocusTarget();
     };
 
     let raf = 0;
