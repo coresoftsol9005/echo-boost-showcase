@@ -183,9 +183,11 @@ export default function CinematicLayer() {
       scaleTarget = 1.8;
     };
 
+    let lastClientX = tx, lastClientY = ty;
     const onMove = (e: MouseEvent) => {
       focusActive = false;
       focusedEl = null;
+      lastClientX = e.clientX; lastClientY = e.clientY;
       tx = e.clientX; ty = e.clientY;
     };
     const onFocusIn = (e: FocusEvent) => {
