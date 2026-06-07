@@ -183,9 +183,11 @@ export default function CinematicLayer() {
       scaleTarget = 1.8;
     };
 
+    let lastClientX = tx, lastClientY = ty;
     const onMove = (e: MouseEvent) => {
       focusActive = false;
       focusedEl = null;
+      lastClientX = e.clientX; lastClientY = e.clientY;
       tx = e.clientX; ty = e.clientY;
     };
     const onFocusIn = (e: FocusEvent) => {
@@ -204,6 +206,13 @@ export default function CinematicLayer() {
     };
     const onScroll = () => {
       if (focusActive) updateFocusTarget();
+      // Keep the custom pointer "alive" while scrolling without mouse movement:
+      // refresh hover affordance based on element under the last known cursor position.
+      const el = document.elementFromPoint(lastClientX, lastClientY) as HTMLElement | null;
+      if (el && !focusActive) {
+        hoverAccent = !!el.closest?.("a, button, [role='button']");
+        scaleTarget = hoverAccent ? 1.8 : 1;
+      }
       const y = window.scrollY;
       const delta = y - lastScrollY;
       lastScrollY = y;
